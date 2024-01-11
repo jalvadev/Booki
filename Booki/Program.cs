@@ -1,4 +1,6 @@
 using Booki.Models.Context;
+using Booki.Repositories;
+using Booki.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,6 +17,7 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 // CONFIGURATION: Database.
 builder.Services.AddDbContext<BookiContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("BookiDB")));
+builder.Services.AddScoped(typeof(IUserRepository), typeof(UserReposiroty));
 
 var app = builder.Build();
 

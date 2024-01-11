@@ -1,4 +1,7 @@
-﻿using Booki.Models.DTOs;
+﻿using AutoMapper;
+using Booki.Models;
+using Booki.Models.DTOs;
+using Booki.Repositories.Interfaces;
 using Booki.Wrappers;
 using Booki.Wrappers.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -6,15 +9,24 @@ using System.Text.RegularExpressions;
 
 namespace Booki.Controllers
 {
+    [ApiController]
+    [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
-        public AuthController() { }
+        private readonly IUserRepository _userRepository;
+        private readonly IMapper _mapper;
+        public AuthController(IUserRepository userRepository, IMapper mapper) 
+        {
+            _userRepository = userRepository;
+            _mapper = mapper;
+        }
 
         public IActionResult Login(UserLoginDTO user)
         {
             return Ok(user);
         }
 
+        [HttpPost]
         public IActionResult Register(UserRegistrationDTO user)
         {
             IResponse response;
@@ -103,7 +115,27 @@ namespace Booki.Controllers
         {
             IResponse response;
 
+            User userToRegister = MapRegisterUser(user);
+            userToRegister = _userRepository.RegisterUser(userToRegister);
+            if (userToRegister == null)
+                response = new SimpleResponse { Success = false, Message = "Ha ocurrido un error al registrar el usuario." };
+            else
+            {
+                UserLoginDTO registeredUser = _mapper.Map<UserLoginDTO>(userToRegister);
+                response = new ComplexResponse<UserLoginDTO> { Success = true, Message = "Usuario registrado.", Result = registeredUser };
+            }
+
             return response;
+        }
+
+        private User MapRegisterUser(UserRegistrationDTO user)
+        {
+            User userToRegister = _mapper.Map<User>(user);
+            userToRegister.CreationDate = DateTime.Now;
+            userToRegister.LastUpdate = DateTime.Now;
+            userToRegister.ProfilePicture = "";
+
+            return userToRegister;
         }
         #endregion
     }
