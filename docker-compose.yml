@@ -1,0 +1,22 @@
+version: '3.4'
+
+services:
+  booki:
+    image: ${DOCKER_REGISTRY-}booki
+    container_name: booki
+    ports:
+        - "5001:80"
+        - "5000:433"
+    build:
+      context: .
+      dockerfile: Booki/Dockerfile
+  bookidatabase:
+    image: ${DOCKER_REGISTRY-}postgres
+    container_name: booki_database
+    ports:
+        - "5432:5432" #Host:Container
+    environment:
+        - POSTGRES_USER=admin
+        - POSTGRES_PASSWORD=pass123
+    volumes:
+      - "C:/Data/Booki:/var/lib/postgresql/data" #volume name:path for db data.
