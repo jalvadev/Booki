@@ -19,6 +19,8 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddDbContext<BookiContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("BookiDB")));
 builder.Services.AddScoped(typeof(IUserRepository), typeof(UserReposiroty));
 
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

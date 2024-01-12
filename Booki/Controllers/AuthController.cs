@@ -134,6 +134,7 @@ namespace Booki.Controllers
             userToRegister.CreationDate = DateTime.Now;
             userToRegister.LastUpdate = DateTime.Now;
             userToRegister.ProfilePicture = "";
+            userToRegister.Bookshelf = new Bookshelf();
 
             return userToRegister;
         }

@@ -38,9 +38,8 @@ namespace Booki.Repositories
 
         protected virtual void Dispose(bool disposing)
         {
-            if(_disposed) 
-                if(disposing)
-                    _bookiContext.Dispose();
+            if (_disposed && disposing)
+                _bookiContext.Dispose();
 
             _disposed = true;
         }
