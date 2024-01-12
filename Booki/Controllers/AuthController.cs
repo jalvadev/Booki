@@ -5,6 +5,7 @@ using Booki.Repositories.Interfaces;
 using Booki.Wrappers;
 using Booki.Wrappers.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Npgsql.Replication;
 using System.Text.RegularExpressions;
 
 namespace Booki.Controllers
@@ -21,17 +22,74 @@ namespace Booki.Controllers
             _mapper = mapper;
         }
 
+        [HttpGet]
         public IActionResult Login(UserLoginDTO user)
         {
-            return Ok(user);
+            IResponse response;
+
+            response = CheckUserLoginData(user);
+            if(!response.Success)
+                return BadRequest(response);
+
+            response = LoginUser(user.UserName, user.Password);
+            if(!response.Success)
+                return BadRequest(response);
+
+            return Ok(response);
         }
+
+        #region Login Private Methods
+
+        private IResponse CheckUserLoginData(UserLoginDTO user)
+        {
+            IResponse response;
+
+            response = CheckLoginMandatoryFields(user);
+
+            return response;
+        }
+
+        private IResponse CheckLoginMandatoryFields(UserLoginDTO user)
+        {
+            IResponse response;
+
+            if (user == null)
+                response = new SimpleResponse { Success = false, Message = "Faltan campos por rellenar." };
+            else if (string.IsNullOrEmpty(user.UserName))
+                response = new SimpleResponse { Success = false, Message = "El username no puede estar vacío." };
+            else if (string.IsNullOrEmpty(user.Password))
+                response = new SimpleResponse { Success = false, Message = "La contraseña es obligatoria." };
+            else
+                response = new SimpleResponse { Success = true, Message = "Todos los campos ok." };
+
+            return response;
+        }
+
+        private IResponse LoginUser(string username, string password)
+        {
+            IResponse response;
+
+            User user = _userRepository.LoginUser(username, password);
+            if (user != null)
+            {
+                UserProfileDTO userProfileDTO = _mapper.Map<UserProfileDTO>(user);
+                response = new ComplexResponse<UserProfileDTO> { Success = true, Message = "Usuario logeado.", Result = userProfileDTO };
+            }
+            else
+            {
+                response = new SimpleResponse { Success = false, Message = "Credenciales no validas." };
+            }
+
+            return response;
+        }
+        #endregion
 
         [HttpPost]
         public IActionResult Register(UserRegistrationDTO user)
         {
             IResponse response;
 
-            response = CheckUserData(user);
+            response = CheckUserRegistrationData(user);
             if (!response.Success)
                 return BadRequest(response);
 
@@ -39,13 +97,13 @@ namespace Booki.Controllers
             if(!response.Success)
                 return BadRequest(response);
 
-            return Ok(user);
+            return Ok(response);
         }
 
 
         #region Register Private Methods
 
-        private IResponse CheckUserData(UserRegistrationDTO user)
+        private IResponse CheckUserRegistrationData(UserRegistrationDTO user)
         {
             IResponse response;
 

@@ -50,6 +50,19 @@ namespace Booki.Profiles
                     dest => dest.Password,
                     opt => opt.MapFrom(src => src.Password)
                 );
+            CreateMap<User, UserProfileDTO>()
+                .ForMember(
+                    dest => dest.UserName,
+                    opt => opt.MapFrom(src => src.Username)
+                )
+                .ForMember(
+                    dest => dest.Email,
+                    opt => opt.MapFrom(src => src.Email)
+                )
+                .ForMember(
+                    dest => dest.ProfilePicture,
+                    opt => opt.MapFrom(src => src.ProfilePicture)
+                );
         }
     }
 }

@@ -15,6 +15,19 @@ namespace Booki.Repositories
             _disposed = false;
         }
 
+        public User LoginUser(string username, string password)
+        {
+            User user = null;
+            try
+            {
+                user = _bookiContext.Users.Where(u => u.Username == username && u.Password == password).FirstOrDefault();
+            }catch (Exception ex)
+            {
+                user = null;
+            }
+
+            return user;
+        }
 
         public User RegisterUser(User user)
         {
