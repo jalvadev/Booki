@@ -1,4 +1,6 @@
-﻿using Booki.Helpers;
+﻿using AutoMapper;
+using Booki.Helpers;
+using Booki.Models;
 using Booki.Models.DTOs;
 using Booki.Wrappers;
 using Booki.Wrappers.Interfaces;
@@ -10,6 +12,13 @@ namespace Booki.Controllers
     [Route("api/[controller]")]
     public class BooksController : ControllerBase
     {
+        private readonly IMapper _mapper;
+        public BooksController(IMapper mapper)
+        {
+            _mapper = mapper;
+        }
+
+        [HttpPost]
         public IActionResult InsertBook(BookDTO newBook)
         {
             IResponse response = CheckMandatoryFields(newBook);
@@ -20,7 +29,12 @@ namespace Booki.Controllers
             if(!response.Success)
                 return BadRequest(response);
 
+            var responseJWT = response as ComplexResponse<int>;
+            int userId = responseJWT.Result;
 
+            response = InsertBook(newBook,userId);
+            if(!response.Success)
+                return BadRequest(response);
 
             return Ok(response);
         }
@@ -41,6 +55,24 @@ namespace Booki.Controllers
                 response = new SimpleResponse { Success = true, Message = "Todos los campos ok." };
 
             return response;
+        }
+
+        private IResponse InsertBook(BookDTO newBook, int userId)
+        {
+            IResponse response;
+
+            response = MapBookObject(newBook);
+
+
+            return response;
+        }
+
+        private IResponse MapBookObject(BookDTO book)
+        {
+            IResponse response;
+            Book bookMapped = _mapper.Map<Book>(book);
+
+            return response = new ComplexResponse<Book> { Success = true, Message = "Object mapped", Result = bookMapped };
         }
         #endregion
     }

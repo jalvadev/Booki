@@ -70,7 +70,6 @@ namespace Booki.Controllers
 
         private void EncryptPassword(ref UserLoginDTO user)
         {
-            IResponse response;
             user.Password = Crypto.GenerateSHA512String(user.Password);
         }
 
