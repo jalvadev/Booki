@@ -4,6 +4,7 @@ using Booki.Models.DTOs;
 using Booki.Repositories.Interfaces;
 using Booki.Wrappers;
 using Booki.Wrappers.Interfaces;
+using Cryptolib;
 using Microsoft.AspNetCore.Mvc;
 using Npgsql.Replication;
 using System.Text.RegularExpressions;
@@ -30,6 +31,8 @@ namespace Booki.Controllers
             response = CheckUserLoginData(user);
             if(!response.Success)
                 return BadRequest(response);
+
+            EncryptPassword(ref user);
 
             response = LoginUser(user.UserName, user.Password);
             if(!response.Success)
@@ -63,6 +66,12 @@ namespace Booki.Controllers
                 response = new SimpleResponse { Success = true, Message = "Todos los campos ok." };
 
             return response;
+        }
+
+        private void EncryptPassword(ref UserLoginDTO user)
+        {
+            IResponse response;
+            user.Password = Crypto.GenerateSHA512String(user.Password);
         }
 
         private IResponse LoginUser(string username, string password)
@@ -193,6 +202,7 @@ namespace Booki.Controllers
             userToRegister.LastUpdate = DateTime.Now;
             userToRegister.ProfilePicture = "";
             userToRegister.Bookshelf = new Bookshelf();
+            userToRegister.Password = Crypto.GenerateSHA512String(user.Password);
 
             return userToRegister;
         }
