@@ -2,6 +2,7 @@
 using Booki.Helpers;
 using Booki.Models;
 using Booki.Models.DTOs;
+using Booki.Repositories.Interfaces;
 using Booki.Wrappers;
 using Booki.Wrappers.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -12,9 +13,11 @@ namespace Booki.Controllers
     [Route("api/[controller]")]
     public class BooksController : ControllerBase
     {
+        private readonly IBookRepository _bookRepository;
         private readonly IMapper _mapper;
-        public BooksController(IMapper mapper)
+        public BooksController(IBookRepository bookRepository, IMapper mapper)
         {
+            _bookRepository = bookRepository;
             _mapper = mapper;
         }
 
@@ -63,6 +66,11 @@ namespace Booki.Controllers
 
             response = MapBookObject(newBook);
 
+            if (response.Success)
+            {
+                var bookResponse = response as ComplexResponse<Book>;
+                _bookRepository.InsertBook(bookResponse.Result, userId);
+            }
 
             return response;
         }
@@ -70,9 +78,23 @@ namespace Booki.Controllers
         private IResponse MapBookObject(BookDTO book)
         {
             IResponse response;
-            Book bookMapped = _mapper.Map<Book>(book);
 
-            return response = new ComplexResponse<Book> { Success = true, Message = "Object mapped", Result = bookMapped };
+            try
+            {
+                Book bookMapped = _mapper.Map<Book>(book);
+
+                bookMapped.CreationDate = DateTime.Now;
+                bookMapped.LastUpdate = DateTime.Now;
+
+                response = new ComplexResponse<Book> { Success = true, Message = "Object mapped", Result = bookMapped };
+            }
+            catch(Exception ex) 
+            {
+                response = new SimpleResponse { Success = false, Message= ex.Message };
+            }
+
+
+            return response;
         }
         #endregion
     }

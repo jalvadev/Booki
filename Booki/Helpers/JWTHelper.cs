@@ -7,7 +7,7 @@ namespace Booki.Helpers
     {
         public static IResponse GetUserIdFromHttpContext(HttpContext httpContext)
         {
-            return new ComplexResponse<int> { Success = true, Message = "User ID obtained successfuly.", Result = 1 };
+            return new ComplexResponse<int> { Success = true, Message = "User ID obtained successfuly.", Result = 36 };
         }
     }
 }
