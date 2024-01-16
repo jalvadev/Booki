@@ -29,6 +29,7 @@ namespace Booki.Repositories
                 bookshelf.Books.Add(book);
 
                 var result = _bookiContext.Update(bookshelf);
+                insertedBook = result.Entity.Books.FirstOrDefault();
 
                 Save();
             }catch(Exception ex)

@@ -63,13 +63,18 @@ namespace Booki.Controllers
         private IResponse InsertBook(BookDTO newBook, int userId)
         {
             IResponse response;
+            Book bookToInsert;
 
             response = MapBookObject(newBook);
 
             if (response.Success)
             {
                 var bookResponse = response as ComplexResponse<Book>;
-                _bookRepository.InsertBook(bookResponse.Result, userId);
+                bookToInsert =  bookResponse.Result;
+                bookToInsert = _bookRepository.InsertBook(bookToInsert, userId);
+
+                response = bookToInsert == null ? new SimpleResponse { Success = false, Message = "No se ha podido insertar el libro." } 
+                    : new ComplexResponse<Book> { Success = true, Message = "El libro se ha insertado correctamente.", Result =  bookToInsert };
             }
 
             return response;
