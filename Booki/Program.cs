@@ -17,7 +17,8 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 // CONFIGURATION: Database.
 builder.Services.AddDbContext<BookiContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("BookiDB")));
-builder.Services.AddScoped(typeof(IUserRepository), typeof(UserReposiroty));
+builder.Services.AddScoped(typeof(IUserRepository), typeof(UserRepository));
+builder.Services.AddScoped(typeof(IBookRepository), typeof(BookRepository));
 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 

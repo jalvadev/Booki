@@ -4,46 +4,41 @@ using Booki.Repositories.Interfaces;
 
 namespace Booki.Repositories
 {
-    public class UserReposiroty : IUserRepository
+    public class BookRepository : IBookRepository
     {
         private readonly BookiContext _bookiContext;
         private bool _disposed;
 
-        public UserReposiroty(BookiContext bookiContext)
+        public BookRepository(BookiContext bookiContext)
         {
             _bookiContext = bookiContext;
             _disposed = false;
         }
 
-        public User LoginUser(string username, string password)
+
+        public Book InsertBook(Book book, int userId)
         {
-            User user = null;
+            Book insertedBook = new Book();
+
             try
             {
-                user = _bookiContext.Users.Where(u => u.Username == username && u.Password == password).FirstOrDefault();
-            }catch (Exception ex)
-            {
-                user = null;
-            }
+                Bookshelf bookshelf = _bookiContext.Users.Where(u => u.Id == userId).Select(u => u.Bookshelf).FirstOrDefault();
+                if(bookshelf.Books == null)
+                    bookshelf.Books = new List<Book>();
 
-            return user;
-        }
+                bookshelf.Books.Add(book);
 
-        public User RegisterUser(User user)
-        {
-            try
-            {
-                var result = _bookiContext.Users.Add(user);
-                user = result.Entity;
+                var result = _bookiContext.Update(bookshelf);
+                insertedBook = result.Entity.Books.FirstOrDefault();
+
                 Save();
             }catch(Exception ex)
             {
-                user = null;
+                insertedBook = null;
             }
 
-            return user;
+            return insertedBook;
         }
-
         public void Save()
         {
             _bookiContext.SaveChanges();
