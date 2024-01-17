@@ -21,6 +21,39 @@ namespace Booki.Controllers
             _mapper = mapper;
         }
 
+        [HttpGet]
+        public IActionResult Index()
+        {
+            IResponse response = JWTHelper.GetUserIdFromHttpContext(HttpContext);
+            if (!response.Success)
+                return BadRequest(response);
+
+            var responseJWT = response as ComplexResponse<int>;
+            int userId = responseJWT.Result;
+
+            response = ListBooksByUser(userId);
+            if (!response.Success)
+                return BadRequest(response);
+
+            return Ok(response);
+        }
+
+        #region Private Index Methods
+        
+        private IResponse ListBooksByUser(int userId)
+        {
+            IResponse response;
+
+            List<Book> booksByUser = _bookRepository.GetBooksByUserId(userId);
+            
+            response = booksByUser == null ? new SimpleResponse { Success = false, Message = "Hubo un error al recuperar los libros." } 
+                : new ComplexResponse<List<Book>> { Success = false, Message = "Libros obtenidos correctamente.", Result = booksByUser };
+
+            return response;
+        }
+
+        #endregion
+
         [HttpPost]
         public IActionResult Insert(BookDTO newBook)
         {
