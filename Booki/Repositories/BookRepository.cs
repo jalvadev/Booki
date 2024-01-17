@@ -39,6 +39,26 @@ namespace Booki.Repositories
 
             return insertedBook;
         }
+
+        public Book UpdateBook(Book book)
+        {
+            Book updateddBook;
+
+            try
+            {
+                var result = _bookiContext.Update(book);
+                updateddBook = result.Entity;
+
+                Save();
+            }
+            catch (Exception ex)
+            {
+                updateddBook = null;
+            }
+
+            return updateddBook;
+        }
+
         public void Save()
         {
             _bookiContext.SaveChanges();
