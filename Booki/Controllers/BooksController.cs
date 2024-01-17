@@ -22,7 +22,7 @@ namespace Booki.Controllers
         }
 
         [HttpPost]
-        public IActionResult InsertBook(BookDTO newBook)
+        public IActionResult Insert(BookDTO newBook)
         {
             IResponse response = CheckMandatoryFields(newBook);
             if (!response.Success)
@@ -98,6 +98,43 @@ namespace Booki.Controllers
                 response = new SimpleResponse { Success = false, Message= ex.Message };
             }
 
+
+            return response;
+        }
+        #endregion
+
+        [HttpPut]
+        public IActionResult Update(BookDTO book)
+        {
+            IResponse response = CheckMandatoryFields(book);
+            if (!response.Success)
+                return BadRequest(response);
+
+            response = UpdateBook(book);
+            if(!response.Success)
+                return BadRequest(response);
+
+            return Ok(response);
+        }
+
+        #region Private Methods Update
+
+        private IResponse UpdateBook(BookDTO book)
+        {
+            IResponse response;
+            Book bookToUpdate;
+
+            response = MapBookObject(book);
+
+            if (response.Success)
+            {
+                var bookResponse = response as ComplexResponse<Book>;
+                bookToUpdate = bookResponse.Result;
+                bookToUpdate = _bookRepository.UpdateBook(bookToUpdate);
+
+                response = bookToUpdate == null ? new SimpleResponse { Success = false, Message = "No se ha podido actualizar el libro." }
+                    : new ComplexResponse<Book> { Success = true, Message = "El libro se ha actualizado correctamente.", Result = bookToUpdate };
+            }
 
             return response;
         }
