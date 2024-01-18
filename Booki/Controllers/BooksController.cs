@@ -54,6 +54,34 @@ namespace Booki.Controllers
 
         #endregion
 
+        [HttpGet("/{bookId}")]
+        public IActionResult Detail(int bookId)
+        {
+            IResponse response;
+
+            response = GetBookDetail(bookId);
+            if(!response.Success)
+                return BadRequest(response);
+
+            return Ok(response);
+        }
+
+        #region Private Detail Methods
+
+        private IResponse GetBookDetail(int bookId)
+        {
+            IResponse response;
+
+            Book book = _bookRepository.GetBookDetail(bookId);
+
+            response = book == null ? new SimpleResponse { Success = false, Message = "No se pudo obtener el detalle del libro." }
+                : new ComplexResponse<Book> { Success = true, Message = "Detalle del libro obtenido correctamente.", Result = book };
+
+            return response;
+        }
+
+        #endregion
+
         [HttpPost]
         public IActionResult Insert(BookDTO newBook)
         {

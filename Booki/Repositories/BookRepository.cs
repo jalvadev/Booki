@@ -31,6 +31,21 @@ namespace Booki.Repositories
             return userBooks;
         }
 
+        public Book GetBookDetail(int bookId)
+        {
+            Book book;
+
+            try
+            {
+                book = _bookiContext.Books.Where(b => b.Id == bookId).FirstOrDefault();
+            }catch(Exception ex) 
+            {
+                book = null;
+            }
+
+            return book;
+        }
+
         public Book InsertBook(Book book, int userId)
         {
             Book insertedBook = new Book();

@@ -6,6 +6,8 @@ namespace Booki.Repositories.Interfaces
     {
         List<Book> GetBooksByUserId(int userId);
 
+        Book GetBookDetail(int bookId);
+
         Book InsertBook(Book book, int userId);
 
         Book UpdateBook(Book book);
