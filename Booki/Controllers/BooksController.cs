@@ -47,7 +47,7 @@ namespace Booki.Controllers
             List<Book> booksByUser = _bookRepository.GetBooksByUserId(userId);
             
             response = booksByUser == null ? new SimpleResponse { Success = false, Message = "Hubo un error al recuperar los libros." } 
-                : new ComplexResponse<List<Book>> { Success = false, Message = "Libros obtenidos correctamente.", Result = booksByUser };
+                : new ComplexResponse<List<Book>> { Success = true, Message = "Libros obtenidos correctamente.", Result = booksByUser };
 
             return response;
         }
