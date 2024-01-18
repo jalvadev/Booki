@@ -76,6 +76,7 @@ namespace Booki.Repositories
 
             try
             {
+                book.CreationDate = _bookiContext.Books.Where(b => b.Id == book.Id).Select(b => b.CreationDate).FirstOrDefault();
                 var result = _bookiContext.Update(book);
                 updateddBook = result.Entity;
 
@@ -87,6 +88,22 @@ namespace Booki.Repositories
             }
 
             return updateddBook;
+        }
+
+        public bool CheckBookBelongsToUser(int bookId, int userId)
+        {
+            bool belongsToUser;
+
+            try
+            {
+                var bookshelves = _bookiContext.Users.Where(u => u.Id == userId).Select(u => u.Bookshelf);
+                belongsToUser = bookshelves.Select(b => b.Books.Select(ib => ib.Id).Contains(bookId)).Any();
+            }catch (Exception ex)
+            {
+                belongsToUser = false;
+            }
+
+            return belongsToUser;
         }
 
         public void Save()
