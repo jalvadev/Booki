@@ -6,6 +6,7 @@ using Booki.Repositories.Interfaces;
 using Booki.Wrappers;
 using Booki.Wrappers.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace Booki.Controllers
 {
@@ -20,6 +21,88 @@ namespace Booki.Controllers
             _bookRepository = bookRepository;
             _mapper = mapper;
         }
+
+        [HttpGet]
+        public IActionResult Index()
+        {
+            IResponse response = JWTHelper.GetUserIdFromHttpContext(HttpContext);
+            if (!response.Success)
+                return BadRequest(response);
+
+            var responseJWT = response as ComplexResponse<int>;
+            int userId = responseJWT.Result;
+
+            response = ListBooksByUser(userId);
+            if (!response.Success)
+                return BadRequest(response);
+
+            return Ok(response);
+        }
+
+        #region Private Index Methods
+        
+        private IResponse ListBooksByUser(int userId)
+        {
+            IResponse response;
+
+            List<Book> booksByUser = _bookRepository.GetBooksByUserId(userId);
+            
+            response = booksByUser == null ? new SimpleResponse { Success = false, Message = "Hubo un error al recuperar los libros." } 
+                : new ComplexResponse<List<Book>> { Success = true, Message = "Libros obtenidos correctamente.", Result = booksByUser };
+
+            return response;
+        }
+
+        #endregion
+
+        [HttpGet("/{bookId}")]
+        public IActionResult Detail(int bookId)
+        {
+            IResponse response = JWTHelper.GetUserIdFromHttpContext(HttpContext);
+            if (!response.Success)
+                return BadRequest(response);
+
+            var responseJWT = response as ComplexResponse<int>;
+            int userId = responseJWT.Result;
+
+            response = CheckIfBookBelongToUser(bookId, userId);
+            if(!response.Success)
+                return BadRequest(response);
+
+            response = GetBookDetail(bookId);
+            if(!response.Success)
+                return BadRequest(response);
+
+            return Ok(response);
+        }
+
+        #region Private Detail Methods
+
+        private IResponse CheckIfBookBelongToUser(int bookId, int userId)
+        {
+            IResponse response;
+
+            bool belongsToUser = _bookRepository.CheckBookBelongsToUser(bookId, userId);
+
+            response = !belongsToUser ? new SimpleResponse { Success = false, Message = "El libro no pertenece al usuario." }
+                : new SimpleResponse { Success = true, Message = "EL libro pertenece al usuario." };
+
+            return response;
+        }
+
+        private IResponse GetBookDetail(int bookId)
+        {
+            IResponse response;
+
+            Book book = _bookRepository.GetBookDetail(bookId);
+
+            response = book == null ? new SimpleResponse { Success = false, Message = "No se pudo obtener el detalle del libro." }
+                : new ComplexResponse<Book> { Success = true, Message = "Detalle del libro obtenido correctamente.", Result = book };
+
+            return response;
+        }
+
+        #endregion
 
         [HttpPost]
         public IActionResult Insert(BookDTO newBook)
@@ -110,6 +193,17 @@ namespace Booki.Controllers
             if (!response.Success)
                 return BadRequest(response);
 
+            response = JWTHelper.GetUserIdFromHttpContext(HttpContext);
+            if (!response.Success)
+                return BadRequest(response);
+
+            var responseJWT = response as ComplexResponse<int>;
+            int userId = responseJWT.Result;
+
+            response = CheckIfBookBelongToUser(book.Id, userId);
+            if (!response.Success)
+                return BadRequest(response);
+
             response = UpdateBook(book);
             if(!response.Success)
                 return BadRequest(response);
@@ -124,7 +218,7 @@ namespace Booki.Controllers
             IResponse response;
             Book bookToUpdate;
 
-            response = MapBookObject(book);
+            response = MapUpdateBookObject(book);
 
             if (response.Success)
             {
@@ -135,6 +229,26 @@ namespace Booki.Controllers
                 response = bookToUpdate == null ? new SimpleResponse { Success = false, Message = "No se ha podido actualizar el libro." }
                     : new ComplexResponse<Book> { Success = true, Message = "El libro se ha actualizado correctamente.", Result = bookToUpdate };
             }
+
+            return response;
+        }
+
+        private IResponse MapUpdateBookObject(BookDTO book)
+        {
+            IResponse response;
+
+            try
+            {
+                Book bookMapped = _mapper.Map<Book>(book);
+                bookMapped.LastUpdate = DateTime.Now;
+
+                response = new ComplexResponse<Book> { Success = true, Message = "Object mapped", Result = bookMapped };
+            }
+            catch (Exception ex)
+            {
+                response = new SimpleResponse { Success = false, Message = ex.Message };
+            }
+
 
             return response;
         }

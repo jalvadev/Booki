@@ -15,6 +15,36 @@ namespace Booki.Repositories
             _disposed = false;
         }
 
+        public List<Book> GetBooksByUserId(int userId)
+        {
+            List<Book> userBooks;
+
+            try
+            {
+                userBooks = _bookiContext.Users.Where(u => u.Id == userId).Select(u => u.Bookshelf.Books).FirstOrDefault();
+
+            }catch(Exception ex)
+            {
+                userBooks = null;
+            }
+
+            return userBooks;
+        }
+
+        public Book GetBookDetail(int bookId)
+        {
+            Book book;
+
+            try
+            {
+                book = _bookiContext.Books.Where(b => b.Id == bookId).FirstOrDefault();
+            }catch(Exception ex) 
+            {
+                book = null;
+            }
+
+            return book;
+        }
 
         public Book InsertBook(Book book, int userId)
         {
@@ -46,6 +76,7 @@ namespace Booki.Repositories
 
             try
             {
+                book.CreationDate = _bookiContext.Books.Where(b => b.Id == book.Id).Select(b => b.CreationDate).FirstOrDefault();
                 var result = _bookiContext.Update(book);
                 updateddBook = result.Entity;
 
@@ -57,6 +88,22 @@ namespace Booki.Repositories
             }
 
             return updateddBook;
+        }
+
+        public bool CheckBookBelongsToUser(int bookId, int userId)
+        {
+            bool belongsToUser;
+
+            try
+            {
+                var bookshelves = _bookiContext.Users.Where(u => u.Id == userId).Select(u => u.Bookshelf);
+                belongsToUser = bookshelves.Select(b => b.Books.Select(ib => ib.Id).Contains(bookId)).Any();
+            }catch (Exception ex)
+            {
+                belongsToUser = false;
+            }
+
+            return belongsToUser;
         }
 
         public void Save()
