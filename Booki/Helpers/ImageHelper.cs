@@ -11,12 +11,23 @@
 
         public static string CreateUserDirectoryIfNotExists(string username)
         {
-            string fullPathDirectory = $"/{username}";
+            string fullPathDirectory = $"/images/{username}";
 
             if(!Directory.Exists(fullPathDirectory))
                 Directory.CreateDirectory(fullPathDirectory);
 
         
+            return fullPathDirectory;
+        }
+
+        public static string CreateBooksDirectoryIfNotExists(string username)
+        {
+            string fullPathDirectory = $"/images/{username}/Books";
+
+            if (!Directory.Exists(fullPathDirectory))
+                Directory.CreateDirectory(fullPathDirectory);
+
+
             return fullPathDirectory;
         }
 
