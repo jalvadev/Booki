@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Booki.Helpers;
 using Booki.Models;
 using Booki.Models.DTOs;
 using Booki.Repositories.Interfaces;
@@ -181,14 +182,52 @@ namespace Booki.Controllers
         {
             IResponse response;
 
+            response = UploadProfileImage(user);
+
+            if (response.Success)
+            {
+                response = InsertUser(user);
+            }
+
+            return response;
+        }
+
+        private IResponse UploadProfileImage(UserRegistrationDTO user)
+        {
+            IResponse response;
+
+            try
+            {
+                string userDirectoryPath = ImageHelper.CreateUserDirectoryIfNotExists(user.UserName);
+
+                byte[] coverBytes = ImageHelper.ConvertBase64OnBytes(user.ProfilePicture);
+
+                string currentBookPath = $"{userDirectoryPath}/profilepicture.jpg";
+
+                bool saved = ImageHelper.SaveImage(currentBookPath, coverBytes);
+
+                response = new SimpleResponse { Success = saved, Message = "Foto de perfil guardada." };
+            }
+            catch (Exception e)
+            {
+                response = new SimpleResponse { Success = false, Message = "Error al guardar la imagen" };
+            }
+
+            return response;
+        }
+
+        private IResponse InsertUser(UserRegistrationDTO user)
+        {
+            IResponse response;
+
             User userToRegister = MapRegisterUser(user);
             userToRegister = _userRepository.RegisterUser(userToRegister);
             if (userToRegister == null)
                 response = new SimpleResponse { Success = false, Message = "Ha ocurrido un error al registrar el usuario." };
             else
             {
-                UserLoginDTO registeredUser = _mapper.Map<UserLoginDTO>(userToRegister);
-                response = new ComplexResponse<UserLoginDTO> { Success = true, Message = "Usuario registrado.", Result = registeredUser };
+                UserProfileDTO registeredUser = _mapper.Map<UserProfileDTO>(userToRegister);
+                response = new ComplexResponse<UserProfileDTO> { Success = true, Message = "Usuario registrado.", Result = registeredUser };
             }
 
             return response;
@@ -199,7 +238,7 @@ namespace Booki.Controllers
             User userToRegister = _mapper.Map<User>(user);
             userToRegister.CreationDate = DateTime.Now;
             userToRegister.LastUpdate = DateTime.Now;
-            userToRegister.ProfilePicture = "";
+            userToRegister.ProfilePicture = "profilepicture.jpg";
             userToRegister.Bookshelf = new Bookshelf();
             userToRegister.Password = Crypto.GenerateSHA512String(user.Password);
 

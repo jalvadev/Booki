@@ -10,6 +10,8 @@ services:
     build:
       context: .
       dockerfile: Booki/Dockerfile
+    volumes:
+      - "C:/images:/images" #volume name:path for app images.
   bookidatabase:
     image: ${DOCKER_REGISTRY-}postgres
     container_name: booki_database
