@@ -44,6 +44,21 @@ namespace Booki.Repositories
             return user;
         }
 
+        public bool CheckIfUsernameIsAvailable(string username)
+        {
+            bool isTaken = false;
+
+            try
+            {
+                isTaken = _bookiContext.Users.Where(u => u.Username == username).Any();
+            }catch(Exception ex)
+            {
+                isTaken = true;
+            }
+
+            return isTaken;
+        }
+
         public void Save()
         {
             _bookiContext.SaveChanges();

@@ -121,6 +121,9 @@ namespace Booki.Controllers
             if (response.Success)
                 response = CheckPasswordIsCorrect(user);
 
+            if (response.Success)
+                response = CheckUserNameIsCorrect(user);
+
             return response;
         }
         private IResponse CheckRegisterMandatoryFields(UserRegistrationDTO user)
@@ -176,6 +179,16 @@ namespace Booki.Controllers
                 response = new SimpleResponse { Success = false, Message = "Las contraseñas no coinciden." };
 
             return response;
+        }
+
+        private IResponse CheckUserNameIsCorrect(UserRegistrationDTO user)
+        {
+            IResponse response;
+
+            bool isTaken = _userRepository.CheckIfUsernameIsAvailable(user.UserName);
+
+            return isTaken ? new SimpleResponse { Success = false, Message = "El nombre de usuario ya está cogido." }
+                : new SimpleResponse { Success = true, Message = "El nombre de usuario está libre." };
         }
 
         private IResponse RegisterUser(UserRegistrationDTO user)
