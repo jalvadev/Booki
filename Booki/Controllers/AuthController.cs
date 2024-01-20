@@ -6,8 +6,10 @@ using Booki.Repositories.Interfaces;
 using Booki.Wrappers;
 using Booki.Wrappers.Interfaces;
 using Cryptolib;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Npgsql.Replication;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Primitives;
 using System.Text.RegularExpressions;
 
 namespace Booki.Controllers
@@ -16,10 +18,12 @@ namespace Booki.Controllers
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
+        private readonly IConfiguration _configuration;
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
-        public AuthController(IUserRepository userRepository, IMapper mapper) 
+        public AuthController(IConfiguration configuration, IUserRepository userRepository, IMapper mapper) 
         {
+            _configuration = configuration;
             _userRepository = userRepository;
             _mapper = mapper;
         }
@@ -81,8 +85,7 @@ namespace Booki.Controllers
             User user = _userRepository.LoginUser(username, password);
             if (user != null)
             {
-                UserProfileDTO userProfileDTO = _mapper.Map<UserProfileDTO>(user);
-                response = new ComplexResponse<UserProfileDTO> { Success = true, Message = "Usuario logeado.", Result = userProfileDTO };
+                response = GetUserDTOWithToken(user);
             }
             else
             {
@@ -90,6 +93,25 @@ namespace Booki.Controllers
             }
 
             return response;
+        }
+
+        private IResponse GetUserDTOWithToken(User user)
+        {
+            UserProfileDTO userProfileDTO = _mapper.Map<UserProfileDTO>(user);
+            userProfileDTO.Token = GetUserToken(user);
+
+            return new ComplexResponse<UserProfileDTO> { Success = true, Message = "Usuario logeado.", Result = userProfileDTO }; ;
+        }
+
+        private string GetUserToken(User user)
+        {
+            var key = _configuration.GetValue<string>("Jwt:Key");
+            var issuer = _configuration.GetValue<string>("Jwt:Issuer");
+            var audience = _configuration.GetValue<string>("Jwt:Audience");
+
+            string token = JWTHelper.GenerateToken(user, key, issuer, audience);
+
+            return token;
         }
         #endregion
 
@@ -120,6 +142,9 @@ namespace Booki.Controllers
 
             if (response.Success)
                 response = CheckPasswordIsCorrect(user);
+
+            if (response.Success)
+                response = CheckUserNameIsCorrect(user);
 
             return response;
         }
@@ -176,6 +201,16 @@ namespace Booki.Controllers
                 response = new SimpleResponse { Success = false, Message = "Las contraseñas no coinciden." };
 
             return response;
+        }
+
+        private IResponse CheckUserNameIsCorrect(UserRegistrationDTO user)
+        {
+            IResponse response;
+
+            bool isTaken = _userRepository.CheckIfUsernameIsAvailable(user.UserName);
+
+            return isTaken ? new SimpleResponse { Success = false, Message = "El nombre de usuario ya está cogido." }
+                : new SimpleResponse { Success = true, Message = "El nombre de usuario está libre." };
         }
 
         private IResponse RegisterUser(UserRegistrationDTO user)
