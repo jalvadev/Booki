@@ -179,7 +179,7 @@ namespace Booki.Controllers
 
                 byte[] coverBytes = ImageHelper.ConvertBase64OnBytes(newBook.CoverPicture);
 
-                string currentBookPath = $"{booksDirectoryPath}/{newBook.Title}.jpg";
+                string currentBookPath = $"{booksDirectoryPath}/{Guid.NewGuid()}.jpg";
                 newBook.CoverPicture = currentBookPath;
 
                 bool saved = ImageHelper.SaveImage(currentBookPath, coverBytes);
