@@ -10,6 +10,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Primitives;
+using System.Net;
+using System.Net.Mail;
 using System.Text.RegularExpressions;
 
 namespace Booki.Controllers
@@ -120,15 +122,18 @@ namespace Booki.Controllers
         {
             IResponse response;
 
-            response = CheckUserRegistrationData(user);
-            if (!response.Success)
-                return BadRequest(response);
+            //response = CheckUserRegistrationData(user);
+            //if (!response.Success)
+            //    return BadRequest(response);
 
-            response = RegisterUser(user);
-            if(!response.Success)
-                return BadRequest(response);
+            //response = RegisterUser(user);
+            //if(!response.Success)
+            //    return BadRequest(response);
 
-            return Ok(response);
+            if (true)
+                SendVerificationEmail(user.Email, new Guid());
+
+            return Ok(true);
         }
 
 
@@ -279,6 +284,37 @@ namespace Booki.Controllers
 
             return userToRegister;
         }
+
+        private void SendVerificationEmail(string userEmail, Guid token)
+        {
+            string host = _configuration.GetValue<string>("Email:host");
+            int port = _configuration.GetValue<int>("Email:port");
+
+            string username = _configuration.GetValue<string>("Email:user");
+            string password = _configuration.GetValue<string>("Email:password");
+            string from = _configuration.GetValue<string>("Email:from");
+            string subject = _configuration.GetValue<string>("Email:subject");
+            string body = _configuration.GetValue<string>("Email:body");
+
+            body = body.Replace("##LINK##", "<a href=\"https://localhost:57345/api/auth/VerifyAccount/" + token + "\">aquí</a>");
+
+            SmtpClient client = new SmtpClient(host, port);
+
+            MailMessage message = new MailMessage(from, userEmail, subject, body);
+            message.IsBodyHtml = true;
+            
+            client.EnableSsl = true;
+            client.UseDefaultCredentials = false;
+            client.Credentials = new NetworkCredential(username, password);
+            
+            client.Send(message);
+        }
         #endregion
+
+        [HttpGet("VerifyAccount/{token}")]
+        public IActionResult VerifyAccount(Guid token)
+        {
+            return Ok("ole");
+        }
     }
 }
