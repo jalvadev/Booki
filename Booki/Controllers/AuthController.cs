@@ -10,6 +10,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Primitives;
+using System.Net;
+using System.Net.Mail;
 using System.Text.RegularExpressions;
 
 namespace Booki.Controllers
@@ -125,8 +127,14 @@ namespace Booki.Controllers
                 return BadRequest(response);
 
             response = RegisterUser(user);
-            if(!response.Success)
+            if (!response.Success)
                 return BadRequest(response);
+
+            if (response.Success)
+            {
+                var result = response as ComplexResponse<UserProfileDTO>;
+                SendVerificationEmail(user.Email, result.Result.VerificationToken);
+            }
 
             return Ok(response);
         }
@@ -276,9 +284,47 @@ namespace Booki.Controllers
             userToRegister.ProfilePicture = "profilepicture.jpg";
             userToRegister.Bookshelf = new Bookshelf();
             userToRegister.Password = Crypto.GenerateSHA512String(user.Password);
+            userToRegister.VerificationToken = Guid.NewGuid();
 
             return userToRegister;
         }
+
+        // TODO : Clean this code ->
+        private void SendVerificationEmail(string userEmail, Guid token)
+        {
+            string host = _configuration.GetValue<string>("Email:host");
+            int port = _configuration.GetValue<int>("Email:port");
+
+            string username = _configuration.GetValue<string>("Email:user");
+            string password = _configuration.GetValue<string>("Email:password");
+            string from = _configuration.GetValue<string>("Email:from");
+            string subject = _configuration.GetValue<string>("Email:subject");
+            string body = _configuration.GetValue<string>("Email:body");
+
+            body = body.Replace("##TOKEN##", token.ToString());
+
+            SmtpClient client = new SmtpClient(host, port);
+
+            MailMessage message = new MailMessage(from, userEmail, subject, body);
+            message.IsBodyHtml = true;
+            
+            client.EnableSsl = true;
+            client.UseDefaultCredentials = false;
+            client.Credentials = new NetworkCredential(username, password);
+            
+            client.Send(message);
+        }
         #endregion
+
+        [HttpGet("VerifyAccount/{token}")]
+        public IActionResult VerifyAccount(Guid token)
+        {
+            bool verified = _userRepository.SetUserVerification(token);
+
+            IResponse response = verified ? new SimpleResponse { Success = true, Message = "Usuario verificado." }
+                : new SimpleResponse { Success = false, Message = "Error al verificar el usuario." };
+
+            return Ok(response);
+        }
     }
 }

@@ -7,5 +7,6 @@ namespace Booki.Repositories.Interfaces
         User LoginUser(string username, string password);
         User RegisterUser(User user);
         bool CheckIfUsernameIsAvailable(string username);
+        bool SetUserVerification(Guid token);
     }
 }

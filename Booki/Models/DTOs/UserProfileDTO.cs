@@ -9,5 +9,7 @@
         public string ProfilePicture { get; set; }
 
         public string Token { get; set; }
+
+        public Guid VerificationToken { get; set; }
     }
 }

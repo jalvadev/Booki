@@ -40,6 +40,10 @@ namespace Booki.Profiles
                 .ForMember(
                     dest => dest.Email,
                     opt => opt.MapFrom(src => src.Email)
+                )
+                .ForMember(
+                    dest => dest.VerificationToken,
+                    opt => opt.MapFrom(src => src.VerificationToken)
                 );
             CreateMap<User, UserLoginDTO>()
                 .ForMember(
