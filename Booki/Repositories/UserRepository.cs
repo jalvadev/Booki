@@ -59,6 +59,27 @@ namespace Booki.Repositories
             return isTaken;
         }
 
+        public bool SetUserVerification(Guid token)
+        {
+            bool verified = false;
+
+            try
+            {
+                User user = _bookiContext.Users.Where(u => u.VerificationToken == token).FirstOrDefault();
+                user.IsVerified = true;
+
+                _bookiContext.Update(user);
+                Save();
+                
+                verified = true;
+            }catch(Exception e)
+            {
+                verified = false;
+            }
+
+            return verified;
+        }
+
         public void Save()
         {
             _bookiContext.SaveChanges();

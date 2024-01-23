@@ -19,5 +19,7 @@
         public DateTime LastUpdate { get; set; }
 
         public Bookshelf Bookshelf { get; set; }
+
+        public Guid VerificationToken { get; set; }
     }
 }
