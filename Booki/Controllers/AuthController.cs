@@ -194,7 +194,7 @@ namespace Booki.Controllers
             bool result = Regex.IsMatch(password, pattern);
 
             response = result ? new SimpleResponse { Success = true, Message = "La contraseña es válida." } 
-            : new SimpleResponse { Success = false, Message = "La contraseña debe tener al menos: 8 carácteres de largo, una letra mayúscula, otra miunúscula y al menos un número." };
+            : new SimpleResponse { Success = false, Message = "La contraseña debe tener al menos: 8 carácteres de largo, una letra mayúscula, otra minúscula y al menos un número." };
 
             return response;
         }
@@ -242,6 +242,9 @@ namespace Booki.Controllers
             try
             {
                 string userDirectoryPath = ImageHelper.CreateUserDirectoryIfNotExists(user.UserName);
+
+                user.ProfilePicture = user.ProfilePicture.Replace("data:image/jpeg;base64,", "");
+                user.ProfilePicture = user.ProfilePicture.Replace("data:image/png;base64,", "");
 
                 byte[] coverBytes = ImageHelper.ConvertBase64OnBytes(user.ProfilePicture);
 
