@@ -30,7 +30,7 @@ namespace Booki.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet]
+        [HttpPost]
         public IActionResult Login(UserLoginDTO user)
         {
             IResponse response;
@@ -117,7 +117,7 @@ namespace Booki.Controllers
         }
         #endregion
 
-        [HttpPost]
+        [HttpPost("[action]")]
         public IActionResult Register(UserRegistrationDTO user)
         {
             IResponse response;
