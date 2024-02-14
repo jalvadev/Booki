@@ -154,6 +154,9 @@ namespace Booki.Controllers
             if (response.Success)
                 response = CheckUserNameIsCorrect(user);
 
+            if(response.Success)
+                response = CheckUserEmailIsCorrect(user);
+
             return response;
         }
         private IResponse CheckRegisterMandatoryFields(UserRegistrationDTO user)
@@ -217,8 +220,18 @@ namespace Booki.Controllers
 
             bool isTaken = _userRepository.CheckIfUsernameIsAvailable(user.UserName);
 
-            return isTaken ? new SimpleResponse { Success = false, Message = "El nombre de usuario ya está cogido." }
+            return isTaken ? new SimpleResponse { Success = false, Message = "El nombre de usuario ya está en uso." }
                 : new SimpleResponse { Success = true, Message = "El nombre de usuario está libre." };
+        }
+
+        private IResponse CheckUserEmailIsCorrect(UserRegistrationDTO user)
+        {
+            IResponse response;
+
+            bool isTaken = _userRepository.CheckIfEmailIsAvailable(user.Email);
+
+            return isTaken ? new SimpleResponse { Success = false, Message = "El email ya está en uso." }
+            : new SimpleResponse { Success = true, Message = "El email está libre." };
         }
 
         private IResponse RegisterUser(UserRegistrationDTO user)

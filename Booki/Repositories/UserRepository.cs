@@ -20,7 +20,7 @@ namespace Booki.Repositories
             User user = null;
             try
             {
-                user = _bookiContext.Users.Where(u => u.Username == username && u.Password == password).FirstOrDefault();
+                user = _bookiContext.Users.Where(u => u.Username == username && u.Password == password && u.IsVerified).FirstOrDefault();
             }catch (Exception ex)
             {
                 user = null;
@@ -52,6 +52,22 @@ namespace Booki.Repositories
             {
                 isTaken = _bookiContext.Users.Where(u => u.Username == username).Any();
             }catch(Exception ex)
+            {
+                isTaken = true;
+            }
+
+            return isTaken;
+        }
+
+        public bool CheckIfEmailIsAvailable(string email)
+        {
+            bool isTaken = false;
+
+            try
+            {
+                isTaken = _bookiContext.Users.Where(u => u.Email == email).Any();
+            }
+            catch (Exception ex)
             {
                 isTaken = true;
             }
