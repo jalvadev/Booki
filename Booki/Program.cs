@@ -50,6 +50,7 @@ builder.Services.AddAuthorization();
 builder.Services.AddCors(c => c.AddPolicy("corsapp", builder =>
 {
     builder.WithOrigins("http://127.0.0.1:5500").AllowAnyMethod().AllowAnyHeader();
+    builder.WithOrigins("https://mabooki.netlify.app").AllowAnyMethod().AllowAnyHeader();
 }));
 
 var app = builder.Build();
