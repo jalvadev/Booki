@@ -47,9 +47,9 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddAuthorization();
 
 // Service cors for development.
-builder.Services.AddCors(c => c.AddPolicy("corsapp", builder =>
+builder.Services.AddCors(c => c.AddPolicy("AllowSpecificOrigin", builder =>
 {
-    builder.WithOrigins("http://127.0.0.1:5500", "https://mabooki.netlify.app").AllowAnyMethod().AllowAnyHeader();
+    builder.WithOrigins("https://mabooki.netlify.app").AllowAnyMethod().AllowAnyHeader();
 }));
 
 var app = builder.Build();
@@ -61,7 +61,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseCors("corsapp");
+app.UseCors("AllowSpecificOrigin");
 
 // If there ir any pending migration, exec it.
 using (var scope = app.Services.CreateScope())
