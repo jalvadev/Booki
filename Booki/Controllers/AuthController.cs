@@ -30,7 +30,7 @@ namespace Booki.Controllers
             _mapper = mapper;
         }
 
-        [HttpPost]
+        [HttpPost("[action]")]
         public IActionResult Login(UserLoginDTO user)
         {
             IResponse response;
