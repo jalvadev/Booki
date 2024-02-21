@@ -31,7 +31,7 @@ namespace Booki.Controllers
         }
 
         [HttpPost("[action]")]
-        public IActionResult Login(UserLoginDTO user)
+        public IActionResult Login([FromBody]UserLoginDTO user)
         {
             IResponse response;
 
