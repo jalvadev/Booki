@@ -49,7 +49,7 @@ builder.Services.AddAuthorization();
 // Service cors for development.
 builder.Services.AddCors(c => c.AddPolicy("AllowSpecificOrigin", builder =>
 {
-    builder.WithOrigins("https://mabooki.netlify.app", "http://127.0.0.1:5500").AllowAnyMethod().AllowAnyHeader();
+    builder.WithOrigins("https://mabooki.netlify.app").AllowAnyMethod().AllowAnyHeader();
 }));
 
 var app = builder.Build();
