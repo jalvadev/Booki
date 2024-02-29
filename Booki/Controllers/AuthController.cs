@@ -256,9 +256,6 @@ namespace Booki.Controllers
             {
                 string userDirectoryPath = ImageHelper.CreateUserDirectoryIfNotExists(user.UserName);
 
-                user.ProfilePicture = user.ProfilePicture.Replace("data:image/jpeg;base64,", "");
-                user.ProfilePicture = user.ProfilePicture.Replace("data:image/png;base64,", "");
-
                 byte[] coverBytes = ImageHelper.ConvertBase64OnBytes(user.ProfilePicture);
 
                 string currentBookPath = $"{userDirectoryPath}/profilepicture.jpg";
