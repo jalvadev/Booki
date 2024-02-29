@@ -106,7 +106,7 @@ namespace Booki.Controllers
 
         #endregion
 
-        [HttpPost]
+        [HttpPost("[action]")]
         public IActionResult Insert(BookDTO newBook)
         {
             IResponse response = CheckMandatoryFields(newBook);

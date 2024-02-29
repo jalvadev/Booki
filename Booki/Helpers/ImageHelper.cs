@@ -4,7 +4,8 @@
     {
         public static byte[] ConvertBase64OnBytes(string base64Image)
         {
-            byte[] imageByter = Convert.FromBase64String(base64Image);
+            string[] pd = base64Image.Split(',');
+            byte[] imageByter = Convert.FromBase64String(pd[1]);
 
             return imageByter;
         }
