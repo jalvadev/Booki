@@ -5,7 +5,7 @@ using Booki.Models.DTOs;
 using Booki.Repositories.Interfaces;
 using Booki.Wrappers;
 using Booki.Wrappers.Interfaces;
-using Cryptolib;
+using Salty;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -13,6 +13,8 @@ using Microsoft.Extensions.Primitives;
 using System.Net;
 using System.Net.Mail;
 using System.Text.RegularExpressions;
+using System.Security.Cryptography;
+using Salty.Hashers;
 
 namespace Booki.Controllers
 {
@@ -77,7 +79,7 @@ namespace Booki.Controllers
 
         private void EncryptPassword(ref UserLoginDTO user)
         {
-            user.Password = Crypto.GenerateSHA512String(user.Password);
+            user.Password = PasswordManager.GeneratePasswordHash(new SHA512Hasher(), user.Password).HashedPassword;
         }
 
         private IResponse LoginUser(string username, string password)
@@ -296,8 +298,12 @@ namespace Booki.Controllers
             userToRegister.LastUpdate = DateTime.Now;
             userToRegister.ProfilePicture = "profilepicture.jpg";
             userToRegister.Bookshelf = new Bookshelf();
-            userToRegister.Password = Crypto.GenerateSHA512String(user.Password);
             userToRegister.VerificationToken = Guid.NewGuid();
+
+            var result = PasswordManager.GeneratePasswordHash(new SHA512Hasher(), user.Password);
+            userToRegister.Password = result.HashedPassword;
+            userToRegister.Salt = result.Salt;
+
 
             return userToRegister;
         }
