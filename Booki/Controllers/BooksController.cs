@@ -27,18 +27,17 @@ namespace Booki.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            IResponse response = JWTHelper.GetUserIdFromHttpContext(HttpContext);
-            if (!response.Success)
-                return BadRequest(response);
+            var userIdResponse = JWTHelper.GetUserIdFromHttpContext(HttpContext);
+            if (!userIdResponse.Success)
+                return BadRequest(userIdResponse);
 
-            var responseJWT = response as ComplexResponse<int>;
-            int userId = responseJWT.Result;
+            int userId = (userIdResponse as ComplexResponse<int>).Result;
 
-            response = ListBooksByUser(userId);
-            if (!response.Success)
-                return BadRequest(response);
+            var bookRepsonse = ListBooksByUser(userId);
+            if (!bookRepsonse.Success)
+                return BadRequest(bookRepsonse);
 
-            return Ok(response);
+            return Ok(bookRepsonse);
         }
 
         #region Private Index Methods
@@ -49,8 +48,9 @@ namespace Booki.Controllers
 
             List<Book> booksByUser = _bookRepository.GetBooksByUserId(userId);
             
-            response = booksByUser == null ? new SimpleResponse { Success = false, Message = "Hubo un error al recuperar los libros." } 
-                : new ComplexResponse<List<Book>> { Success = true, Message = "Libros obtenidos correctamente.", Result = booksByUser };
+            response = booksByUser == null ? 
+                new SimpleResponse { Success = false, Message = "Hubo un error al recuperar los libros." } : 
+                new ComplexResponse<List<Book>> { Success = true, Message = "Libros obtenidos correctamente.", Result = booksByUser };
 
             return response;
         }
@@ -60,22 +60,21 @@ namespace Booki.Controllers
         [HttpGet("/{bookId}")]
         public IActionResult Detail(int bookId)
         {
-            IResponse response = JWTHelper.GetUserIdFromHttpContext(HttpContext);
-            if (!response.Success)
-                return BadRequest(response);
+            var userIdResponse = JWTHelper.GetUserIdFromHttpContext(HttpContext);
+            if (!userIdResponse.Success)
+                return BadRequest(userIdResponse);
 
-            var responseJWT = response as ComplexResponse<int>;
-            int userId = responseJWT.Result;
+            int userId = (userIdResponse as ComplexResponse<int>).Result;
 
-            response = CheckIfBookBelongToUser(bookId, userId);
-            if(!response.Success)
-                return BadRequest(response);
+            var bookBelongsToUserResponse = CheckIfBookBelongToUser(bookId, userId);
+            if(!bookBelongsToUserResponse.Success)
+                return BadRequest(bookBelongsToUserResponse);
 
-            response = GetBookDetail(bookId);
-            if(!response.Success)
-                return BadRequest(response);
+            var bookDetailResponse = GetBookDetail(bookId);
+            if(!bookDetailResponse.Success)
+                return BadRequest(bookDetailResponse);
 
-            return Ok(response);
+            return Ok(bookDetailResponse);
         }
 
         #region Private Detail Methods
