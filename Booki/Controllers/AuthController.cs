@@ -334,8 +334,9 @@ namespace Booki.Controllers
         {
             bool verified = _userRepository.SetUserVerification(token);
 
-            IResponse response = verified ? new SimpleResponse { Success = true, Message = "Usuario verificado." }
-                : new SimpleResponse { Success = false, Message = "Error al verificar el usuario." };
+            IResponse response = verified ? 
+                new SimpleResponse { Success = true, Message = "Usuario verificado." } : 
+                new SimpleResponse { Success = false, Message = "Error al verificar el usuario." };
 
             return Ok(response);
         }
