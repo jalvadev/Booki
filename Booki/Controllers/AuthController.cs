@@ -41,8 +41,6 @@ namespace Booki.Controllers
             if(!response.Success)
                 return BadRequest(response);
 
-            EncryptPassword(ref user);
-
             response = LoginUser(user.UserName, user.Password);
             if(!response.Success)
                 return BadRequest(response);
@@ -57,6 +55,10 @@ namespace Booki.Controllers
             IResponse response;
 
             response = CheckLoginMandatoryFields(user);
+            if (!response.Success)
+                return response;
+
+            response = CheckUserPassword(user);
 
             return response;
         }
@@ -77,9 +79,26 @@ namespace Booki.Controllers
             return response;
         }
 
-        private void EncryptPassword(ref UserLoginDTO user)
+        private IResponse CheckUserPassword(UserLoginDTO user)
         {
-            user.Password = PasswordManager.GeneratePasswordHash(new SHA512Hasher(), user.Password).HashedPassword;
+            IResponse response;
+
+            Tuple<string, string> userPassAndSalt = _userRepository.GetUserSaltAndPass(user.UserName);
+            if (userPassAndSalt == null)
+                response = new SimpleResponse { Success = false, Message = "Hubo un error al obtener el usuario." };
+            else
+            {
+                bool isCorrect = PasswordManager.ChekPasswordHash(new SHA512Hasher(), user.Password, userPassAndSalt.Item2, userPassAndSalt.Item1);
+
+                if (isCorrect)
+                    user.Password = userPassAndSalt.Item1;
+
+                response = isCorrect ?
+                    new SimpleResponse { Success = true, Message = "La contraseña es correcta." } :
+                    new SimpleResponse { Success = false, Message = "La contraseña no es correcta." };
+            }
+
+            return response;
         }
 
         private IResponse LoginUser(string username, string password)
