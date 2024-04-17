@@ -29,6 +29,25 @@ namespace Booki.Repositories
             return user;
         }
 
+        public Tuple<string, string> GetUserSaltAndPass(string username)
+        {
+            Tuple<string, string> userSaltAndPass = null;
+
+            try
+            {
+                var pass = _bookiContext.Users.Where(u => u.Username == username).Select(u => u.Password ).FirstOrDefault();
+                var salt = _bookiContext.Users.Where(u => u.Username == username).Select(u => u.Salt ).FirstOrDefault();
+
+                userSaltAndPass = new Tuple<string, string>(pass, salt);
+
+            }catch (Exception ex)
+            {
+                userSaltAndPass = null;
+            }
+
+            return userSaltAndPass;
+        }
+
         public User RegisterUser(User user)
         {
             try

@@ -5,7 +5,7 @@ using Booki.Models.DTOs;
 using Booki.Repositories.Interfaces;
 using Booki.Wrappers;
 using Booki.Wrappers.Interfaces;
-using Cryptolib;
+using Salty;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -13,6 +13,8 @@ using Microsoft.Extensions.Primitives;
 using System.Net;
 using System.Net.Mail;
 using System.Text.RegularExpressions;
+using System.Security.Cryptography;
+using Salty.Hashers;
 
 namespace Booki.Controllers
 {
@@ -39,8 +41,6 @@ namespace Booki.Controllers
             if(!response.Success)
                 return BadRequest(response);
 
-            EncryptPassword(ref user);
-
             response = LoginUser(user.UserName, user.Password);
             if(!response.Success)
                 return BadRequest(response);
@@ -55,6 +55,10 @@ namespace Booki.Controllers
             IResponse response;
 
             response = CheckLoginMandatoryFields(user);
+            if (!response.Success)
+                return response;
+
+            response = CheckUserPassword(user);
 
             return response;
         }
@@ -75,9 +79,26 @@ namespace Booki.Controllers
             return response;
         }
 
-        private void EncryptPassword(ref UserLoginDTO user)
+        private IResponse CheckUserPassword(UserLoginDTO user)
         {
-            user.Password = Crypto.GenerateSHA512String(user.Password);
+            IResponse response;
+
+            Tuple<string, string> userPassAndSalt = _userRepository.GetUserSaltAndPass(user.UserName);
+            if (userPassAndSalt == null)
+                response = new SimpleResponse { Success = false, Message = "Hubo un error al obtener el usuario." };
+            else
+            {
+                bool isCorrect = PasswordManager.ChekPasswordHash(new SHA512Hasher(), user.Password, userPassAndSalt.Item2, userPassAndSalt.Item1);
+
+                if (isCorrect)
+                    user.Password = userPassAndSalt.Item1;
+
+                response = isCorrect ?
+                    new SimpleResponse { Success = true, Message = "La contraseña es correcta." } :
+                    new SimpleResponse { Success = false, Message = "La contraseña no es correcta." };
+            }
+
+            return response;
         }
 
         private IResponse LoginUser(string username, string password)
@@ -296,8 +317,12 @@ namespace Booki.Controllers
             userToRegister.LastUpdate = DateTime.Now;
             userToRegister.ProfilePicture = "profilepicture.jpg";
             userToRegister.Bookshelf = new Bookshelf();
-            userToRegister.Password = Crypto.GenerateSHA512String(user.Password);
             userToRegister.VerificationToken = Guid.NewGuid();
+
+            var result = PasswordManager.GeneratePasswordHash(new SHA512Hasher(), user.Password);
+            userToRegister.Password = result.HashedPassword;
+            userToRegister.Salt = result.Salt;
+
 
             return userToRegister;
         }
