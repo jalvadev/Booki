@@ -177,7 +177,7 @@ namespace Booki.Controllers
             }
             catch (Exception e)
             {
-                response = new SimpleResponse { Success = false, Message = "Error al guardar la imagen" };
+                response = new SimpleResponse { Success = false, Message = "Error al guardar la imagen." };
             }
 
             return response;
