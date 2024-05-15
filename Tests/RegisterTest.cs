@@ -134,7 +134,7 @@ namespace Tests
             Assert.IsNotNull(result.Value);
             Assert.IsInstanceOf<IResponse>(result.Value);
             Assert.That((result.Value as IResponse).Success, Is.False);
-            Assert.That((result.Value as IResponse).Message, Is.EqualTo("Usuario registrado"));
+            Assert.That((result.Value as IResponse).Message, Is.EqualTo("Ha ocurrido un error al registrar el usuario."));
         }
     }
 }
