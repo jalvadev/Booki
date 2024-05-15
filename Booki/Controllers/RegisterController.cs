@@ -12,20 +12,23 @@ using System.Net;
 using System.Text.RegularExpressions;
 using Booki.Repositories.Interfaces;
 using AutoMapper;
+using Booki.Services.Interfaces;
 
 namespace Booki.Controllers
 {
     public class RegisterController : Controller
     {
         protected IConfiguration _configuration;
+        protected IUserService _userService;
         protected IUserRepository _userRepository;
-        protected IMapper _mapper;
+        protected IImageService _imageService;
 
-        public RegisterController(IConfiguration configuration, IUserRepository userRepository, IMapper mapper)
+        public RegisterController(IConfiguration configuration, IUserService userService, IUserRepository userRepository, IImageService imageService)
         {
             _configuration = configuration;
+            _userService = userService;
             _userRepository = userRepository;
-            _mapper = mapper;
+            _imageService = imageService;
         }
 
         [HttpPost("[action]")]
@@ -50,78 +53,32 @@ namespace Booki.Controllers
             return Ok(response);
         }
 
+        [HttpGet("VerifyAccount/{token}")]
+        public IActionResult VerifyAccount(Guid token)
+        {
+            bool verified = _userRepository.SetUserVerification(token);
+
+            IResponse response = verified ?
+                new SimpleResponse { Success = true, Message = "Usuario verificado." } :
+                new SimpleResponse { Success = false, Message = "Error al verificar el usuario." };
+
+            return Ok(response);
+        }
+
         #region Register Private Methods
 
         private IResponse RegisterUser(UserRegistrationDTO user)
         {
             IResponse response;
 
-            response = UploadProfileImage(user);
+            response = _imageService.SaveImage(user.UserName, user.ProfilePicture);
 
             if (response.Success)
             {
-                response = InsertUser(user);
+                response = _userService.RegisterUser(user);
             }
 
             return response;
-        }
-
-        private IResponse UploadProfileImage(UserRegistrationDTO user)
-        {
-            IResponse response;
-
-            try
-            {
-                string userDirectoryPath = ImageHelper.CreateUserDirectoryIfNotExists(user.UserName);
-
-                byte[] coverBytes = ImageHelper.ConvertBase64OnBytes(user.ProfilePicture);
-
-                string currentBookPath = $"{userDirectoryPath}/profilepicture.jpg";
-
-                bool saved = ImageHelper.SaveImage(currentBookPath, coverBytes);
-
-                response = new SimpleResponse { Success = saved, Message = "Foto de perfil guardada." };
-            }
-            catch (Exception e)
-            {
-                response = new SimpleResponse { Success = false, Message = "Error al guardar la imagen." };
-            }
-
-            return response;
-        }
-
-        private IResponse InsertUser(UserRegistrationDTO user)
-        {
-            IResponse response;
-
-            User userToRegister = MapRegisterUser(user);
-            userToRegister = _userRepository.RegisterUser(userToRegister);
-            if (userToRegister == null)
-                response = new SimpleResponse { Success = false, Message = "Ha ocurrido un error al registrar el usuario." };
-            else
-            {
-                UserProfileDTO registeredUser = _mapper.Map<UserProfileDTO>(userToRegister);
-                response = new ComplexResponse<UserProfileDTO> { Success = true, Message = "Usuario registrado.", Result = registeredUser };
-            }
-
-            return response;
-        }
-
-        private User MapRegisterUser(UserRegistrationDTO user)
-        {
-            User userToRegister = _mapper.Map<User>(user);
-            userToRegister.CreationDate = DateTime.Now;
-            userToRegister.LastUpdate = DateTime.Now;
-            userToRegister.ProfilePicture = "profilepicture.jpg";
-            userToRegister.Bookshelf = new Bookshelf();
-            userToRegister.VerificationToken = Guid.NewGuid();
-
-            var result = PasswordManager.GeneratePasswordHash(new SHA512Hasher(), user.Password);
-            userToRegister.Password = result.HashedPassword;
-            userToRegister.Salt = result.Salt;
-
-
-            return userToRegister;
         }
 
         // TODO : Clean this code ->
@@ -151,16 +108,5 @@ namespace Booki.Controllers
         }
         #endregion
 
-        [HttpGet("VerifyAccount/{token}")]
-        public IActionResult VerifyAccount(Guid token)
-        {
-            bool verified = _userRepository.SetUserVerification(token);
-
-            IResponse response = verified ?
-                new SimpleResponse { Success = true, Message = "Usuario verificado." } :
-                new SimpleResponse { Success = false, Message = "Error al verificar el usuario." };
-
-            return Ok(response);
-        }
     }
 }

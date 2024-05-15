@@ -1,6 +1,8 @@
 using Booki.Models.Context;
 using Booki.Repositories;
 using Booki.Repositories.Interfaces;
+using Booki.Services;
+using Booki.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -24,6 +26,10 @@ builder.Services.AddScoped(typeof(IUserRepository), typeof(UserRepository));
 builder.Services.AddScoped(typeof(IBookRepository), typeof(BookRepository));
 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
+// CONFIGURATION: Services.
+builder.Services.AddScoped(typeof(IImageService), typeof(ImageService));
+builder.Services.AddScoped(typeof(IUserService), typeof(UserService));
 
 // JWT authorization config.
 builder.Services.AddAuthentication(options =>
