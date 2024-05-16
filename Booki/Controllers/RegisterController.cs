@@ -32,7 +32,7 @@ namespace Booki.Controllers
         }
 
         [HttpPost("[action]")]
-        public IActionResult Register(UserRegistrationDTO user)
+        public IActionResult Register([FromBody] UserRegistrationDTO user)
         {
             IResponse response;
 

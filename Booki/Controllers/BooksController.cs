@@ -67,14 +67,13 @@ namespace Booki.Controllers
             if (!response.Success)
                 return BadRequest(response);
 
-            response = JWTHelper.GetUserIdFromHttpContext(HttpContext);
+            response = JWTHelper.GetUserFromHttpContext(HttpContext);
             if (!response.Success)
                 return BadRequest(response);
 
-            var responseJWT = response as ComplexResponse<int>;
-            int userId = responseJWT.Result;
+            User user = (response as ComplexResponse<User>).Result;
 
-            response = InsertBook(newBook, userId);
+            response = InsertBook(newBook, user);
             if (!response.Success)
                 return BadRequest(response);
 
@@ -162,12 +161,12 @@ namespace Booki.Controllers
             return response;
         }
 
-        private IResponse InsertBook(BookDTO newBook, int userId)
+        private IResponse InsertBook(BookDTO newBook, User user)
         {
             IResponse response;
             Book bookToInsert;
 
-            response = SaveCoverImage(newBook, "jalvadev");
+            response = SaveCoverImage(newBook, user.Username);
 
             if (response.Success)
             {
@@ -178,7 +177,7 @@ namespace Booki.Controllers
             {
                 var bookResponse = response as ComplexResponse<Book>;
                 bookToInsert = bookResponse.Result;
-                bookToInsert = _bookRepository.InsertBook(bookToInsert, userId);
+                bookToInsert = _bookRepository.InsertBook(bookToInsert, user.Id);
 
                 response = bookToInsert == null ? 
                     new SimpleResponse { Success = false, Message = "No se ha podido insertar el libro." } : 

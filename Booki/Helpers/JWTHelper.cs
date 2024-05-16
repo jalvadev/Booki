@@ -41,9 +41,9 @@ namespace Booki.Helpers
 
             try
             {
-                var user = httpContext.User;
-                string userIdString = user.FindFirstValue("Id");
-                userId = Convert.ToInt32(userIdString);
+                var response = GetUserFieldsFromHttpContextByName(httpContext, "Id");
+                var resultId = (response as ComplexResponse<string>).Result;
+                userId = Convert.ToInt32(resultId);
 
                 return new ComplexResponse<int> { Success = true, Message = "User ID obtained successfuly.", Result = userId };
             }
@@ -51,6 +51,72 @@ namespace Booki.Helpers
             {
                 userId = -1;
                 return new ComplexResponse<int> { Success = false, Message = "No se puede obtener la sesión del usuario.", Result = userId };
+            }
+        }
+
+        public static IResponse GetUserNameFromHttpContext(HttpContext httpContext)
+        {
+            string userName;
+
+            try
+            {
+                var response = GetUserFieldsFromHttpContextByName(httpContext, "Name");
+                userName = (response as ComplexResponse<string>).Result;
+
+                return new ComplexResponse<string> { Success = true, Message = "User ID obtained successfuly.", Result = userName };
+            }
+            catch (Exception ex)
+            {
+                userName = null;
+                return new ComplexResponse<string> { Success = false, Message = "No se puede obtener la sesión del usuario.", Result = userName };
+            }
+        }
+
+
+        public static IResponse GetUserFromHttpContext(HttpContext httpContext)
+        {
+            User user;
+
+            try
+            {
+                var responseId = GetUserIdFromHttpContext(httpContext);
+                if (!responseId.Success)
+                    return responseId;
+
+                var responseName = GetUserNameFromHttpContext(httpContext);
+                if(!responseName.Success)
+                    return responseName;
+
+                user = new User
+                {
+                    Id = (responseId as ComplexResponse<int>).Result,
+                    Username = (responseName as ComplexResponse<string>).Result
+                };
+
+                return new ComplexResponse<User> { Success = true, Message = "Usuario obtenido.", Result = user };
+            }
+            catch (Exception)
+            {
+                return new SimpleResponse { Success = false, Message = "No se pudo obtener el usuario." };
+            }
+
+        }
+
+        private static IResponse GetUserFieldsFromHttpContextByName(HttpContext httpContext, string fieldName)
+        {
+            string userField;
+
+            try
+            {
+                var user = httpContext.User;
+                userField = user.FindFirstValue(fieldName);
+
+                return new ComplexResponse<string> { Success = true, Message = "No se pudo obtener el campo del usuario.", Result = userField };
+            }
+            catch (Exception ex)
+            {
+                userField = null;
+                return new ComplexResponse<string> { Success = false, Message = "No se puede obtener la sesión del usuario.", Result = userField };
             }
         }
     }

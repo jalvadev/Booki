@@ -21,7 +21,12 @@ namespace Booki.Repositories
 
             try
             {
-                userBooks = _bookiContext.Users.Where(u => u.Id == userId).Select(u => u.Bookshelf.Books).FirstOrDefault();
+                userBooks = _bookiContext.Users
+                                            .Where(u => u.Id == userId)
+                                            .Select(u => u.Bookshelf.Books)
+                                            .FirstOrDefault()
+                                            .OrderByDescending(b => b.FinishDate)
+                                            .ToList();
 
             }catch(Exception ex)
             {
