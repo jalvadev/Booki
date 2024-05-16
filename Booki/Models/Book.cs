@@ -15,5 +15,7 @@
         public DateTime CreationDate { get; set; }
 
         public DateTime LastUpdate { get; set; }
+
+        public string? Commentary { get; set; }
     }
 }

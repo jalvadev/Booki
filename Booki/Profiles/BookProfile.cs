@@ -28,6 +28,10 @@ namespace Booki.Profiles
                 .ForMember(
                     dest => dest.FinishDate,
                     opt => opt.MapFrom(src => src.FinishDate)
+                )
+                .ForMember(
+                    dest => dest.Commentary,
+                    opt => opt.MapFrom(src => src.Commentary)
                 );
 
         }

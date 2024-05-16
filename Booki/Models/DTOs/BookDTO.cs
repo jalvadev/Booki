@@ -11,5 +11,7 @@
         public DateTime FinishDate { get; set; }
 
         public short Rating { get; set; }
+
+        public string? Commentary { get; set; }
     }
 }
