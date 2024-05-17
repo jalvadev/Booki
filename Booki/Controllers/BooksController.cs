@@ -18,9 +18,11 @@ namespace Booki.Controllers
     public class BooksController : ControllerBase
     {
         private readonly IBookService _bookService;
-        public BooksController(IBookService bookService)
+        private readonly IImageService _imageService;
+        public BooksController(IBookService bookService, IImageService imageService)
         {
             _bookService = bookService;
+            _imageService = imageService;
         }
 
         [HttpGet]
@@ -127,36 +129,10 @@ namespace Booki.Controllers
             IResponse response;
             
 
-            response = SaveCoverImage(newBook, user.Username);
+            response = _imageService.SaveCoverImage(newBook, user.Username);
 
             if(response.Success)
                 _bookService.InsertBook(newBook, user.Id);
-
-            return response;
-        }
-
-        private IResponse SaveCoverImage(BookDTO newBook, string userName)
-        {
-            IResponse response;
-
-            try
-            {
-                string userDirectoryPath = ImageHelper.CreateUserDirectoryIfNotExists(userName);
-                string booksDirectoryPath = ImageHelper.CreateBooksDirectoryIfNotExists(userName);
-
-                byte[] coverBytes = ImageHelper.ConvertBase64OnBytes(newBook.CoverPicture);
-
-                string currentBookPath = $"{booksDirectoryPath}/{Guid.NewGuid()}.jpg";
-                newBook.CoverPicture = currentBookPath;
-
-                bool saved = ImageHelper.SaveImage(currentBookPath, coverBytes);
-
-                response = new SimpleResponse { Success = saved, Message = "Libro guardado." };
-            }
-            catch (Exception e)
-            {
-                response = new SimpleResponse { Success = false, Message = "Error al guardar la imagen" };
-            }
 
             return response;
         }
