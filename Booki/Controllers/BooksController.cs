@@ -106,6 +106,23 @@ namespace Booki.Controllers
             return Ok(response);
         }
 
+        [HttpDelete("[action]")]
+        public IActionResult Delete(int id)
+        {
+            IResponse response = JWTHelper.GetUserIdFromHttpContext(HttpContext);
+            if (!response.Success)
+                return BadRequest(response);
+
+            var responseJWT = response as ComplexResponse<int>;
+            int userId = responseJWT.Result;
+
+            response = _bookService.DeleteBook(id, userId);
+            if(!response.Success)
+                return BadRequest(response);
+
+            return Ok(response);
+        }
+
         #region Private Methods
 
         private IResponse CheckMandatoryFields(BookDTO newBook)

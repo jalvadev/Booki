@@ -1,6 +1,8 @@
 ﻿using Booki.Models;
 using Booki.Models.Context;
 using Booki.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Booki.Repositories
 {
@@ -77,23 +79,42 @@ namespace Booki.Repositories
 
         public Book UpdateBook(Book book)
         {
-            Book updateddBook;
+            Book updatedBook;
 
             try
             {
                 book.CreationDate = _bookiContext.Books.Where(b => b.Id == book.Id).Select(b => b.CreationDate).FirstOrDefault();
                 var result = _bookiContext.Update(book);
-                updateddBook = result.Entity;
+                updatedBook = result.Entity;
 
                 Save();
             }
             catch (Exception ex)
             {
-                updateddBook = null;
+                updatedBook = null;
             }
 
-            return updateddBook;
+            return updatedBook;
         }
+
+        public bool DeleteBook(int bookId)
+        {
+
+            bool bookRemoved;
+
+            try
+            {
+                _bookiContext.Books.Where(b => b.Id == bookId).ExecuteDelete();
+
+                bookRemoved = true;
+            }catch(Exception e)
+            {
+                bookRemoved = false;
+            }
+
+            return bookRemoved;
+        }
+
 
         public bool CheckBookBelongsToUser(int bookId, int userId)
         {

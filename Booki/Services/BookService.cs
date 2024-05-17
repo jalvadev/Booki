@@ -87,6 +87,23 @@ namespace Booki.Services
             return response;
         }
 
+        public IResponse DeleteBook(int bookId, int userId)
+        {
+            IResponse response;
+
+            response = CheckIfBookBelongToUser(bookId, userId);
+            
+            if (response.Success)
+            {
+                bool isDeleted = _bookRepository.DeleteBook(bookId);
+                response = isDeleted ?
+                    new SimpleResponse { Success = true, Message = "El libro se ha elimnado correctamente." } :
+                    new SimpleResponse { Success = false, Message = "Hubo un error al elimnar el libro." };
+            }
+
+            return response;            
+        }
+
         public IResponse CheckIfBookBelongToUser(int bookId, int userId)
         {
             IResponse response;

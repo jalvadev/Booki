@@ -14,6 +14,8 @@ namespace Booki.Services.Interfaces
 
         IResponse UpdateBook(BookDTO book);
 
+        IResponse DeleteBook(int bookId, int userId);
+
         IResponse CheckIfBookBelongToUser(int bookId, int userId);
     }
 }

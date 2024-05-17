@@ -12,6 +12,8 @@ namespace Booki.Repositories.Interfaces
 
         Book UpdateBook(Book book);
 
+        bool DeleteBook(int bookId);
+
         bool CheckBookBelongsToUser(int bookId, int userId);
     }
 }
