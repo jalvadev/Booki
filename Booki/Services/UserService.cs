@@ -38,6 +38,22 @@ namespace Booki.Services
             return response;
         }
 
+        public IResponse UserById(int id)
+        {
+            IResponse response;
+
+            User user = _userRepository.UserById(id);
+            if (user == null)
+                response = new SimpleResponse { Success = false, Message = "Ha ocurrido un error al obtener el usuario." };
+            else
+            {
+                UserProfileDTO registeredUser = _mapper.Map<UserProfileDTO>(user);
+                response = new ComplexResponse<UserProfileDTO> { Success = true, Message = "Usuario obtenido.", Result = registeredUser };
+            }
+
+            return response;
+        }
+
         private User MapRegisterUser(UserRegistrationDTO user)
         {
             User userToRegister = _mapper.Map<User>(user);

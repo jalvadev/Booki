@@ -6,5 +6,7 @@ namespace Booki.Services.Interfaces
     public interface IUserService
     {
         IResponse RegisterUser(UserRegistrationDTO user);
+
+        IResponse UserById(int id);
     }
 }

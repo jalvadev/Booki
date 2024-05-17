@@ -63,6 +63,23 @@ namespace Booki.Repositories
             return user;
         }
 
+        public User UserById(int id)
+        {
+            User user = null;
+
+            try
+            {
+                var result = _bookiContext.Users.Where(u => u.Id == id);
+                Save();
+            }
+            catch (Exception ex)
+            {
+                user = null;
+            }
+
+            return user;
+        }
+
         public bool CheckIfUsernameIsAvailable(string username)
         {
             bool isTaken = false;
