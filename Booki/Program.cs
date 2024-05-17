@@ -57,6 +57,7 @@ AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 // CONFIGURATION: Services.
 builder.Services.AddScoped(typeof(IImageService), typeof(ImageService));
 builder.Services.AddScoped(typeof(IUserService), typeof(UserService));
+builder.Services.AddScoped(typeof(IBookService), typeof(BookService));
 
 // JWT authorization config.
 builder.Services.AddAuthentication(options =>
