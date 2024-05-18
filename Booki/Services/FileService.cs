@@ -17,6 +17,7 @@ namespace Booki.Services
                 string userDirectoryPath = FileHelper.CreateUserDirectoryIfNotExists(userName);
 
                 byte[] coverBytes = FileHelper.ConvertBase64OnBytes(picture);
+                coverBytes = FileHelper.ConvertImageToJPG(coverBytes);
 
                 string currentBookPath = $"{userDirectoryPath}/profilepicture.jpg";
 
