@@ -91,6 +91,39 @@ namespace Booki.Services
                 new SimpleResponse { Success = false, Message = "El username ya está en uso." };
         }
 
+        public IResponse UpdateUserPassword(int userId, string password) 
+        {
+            IResponse response;
+            bool success;
+
+            var result = PasswordManager.GeneratePasswordHash(new SHA512Hasher(), password);
+            success = _userRepository.UpdateUserPassword(userId, result.HashedPassword, result.Salt);
+
+            return success ?
+                new SimpleResponse { Success = true, Message = "Contraseña actualizada correctamente." } :
+                new SimpleResponse { Success = false, Message = "Hubo un error al actualizar la contraseña." };
+        }
+
+        public IResponse CheckUserPassword(string username, string password)
+        {
+            IResponse response;
+            bool success;
+
+            Tuple<string, string> userPassAndSalt = _userRepository.GetUserSaltAndPass(username);
+            if (userPassAndSalt == null)
+                response = new SimpleResponse { Success = false, Message = "Hubo un error al obtener el usuario." };
+            else
+            {
+                bool isCorrect = PasswordManager.ChekPasswordHash(new SHA512Hasher(), password, userPassAndSalt.Item2, userPassAndSalt.Item1);
+
+                response = isCorrect ?
+                    new SimpleResponse { Success = true, Message = "La contraseña es correcta." } :
+                    new SimpleResponse { Success = false, Message = "La contraseña no es correcta." };
+            }
+
+            return response;
+        }
+
         private User MapRegisterUser(UserRegistrationDTO user)
         {
             User userToRegister = _mapper.Map<User>(user);

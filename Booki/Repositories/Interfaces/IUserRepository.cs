@@ -9,6 +9,7 @@ namespace Booki.Repositories.Interfaces
         User RegisterUser(User user);
         User UserById(int id);
         User EditUser(User user);
+        bool UpdateUserPassword(int userId, string password, string salt);
         bool CheckIfUsernameIsAvailable(string username);
         bool CheckIfEmailIsAvailable(string email);
         bool SetUserVerification(Guid token);

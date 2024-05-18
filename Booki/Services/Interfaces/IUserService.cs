@@ -12,5 +12,9 @@ namespace Booki.Services.Interfaces
         IResponse EditUser(UserDetailDTO user, int userId);
 
         IResponse CheckIfNewUsernameIsAvailable(string username, string newUsername);
+
+        IResponse UpdateUserPassword(int userId, string password);
+
+        IResponse CheckUserPassword(string username, string password);
     }
 }

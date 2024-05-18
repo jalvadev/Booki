@@ -1,6 +1,7 @@
 ﻿using Booki.Models;
 using Booki.Models.Context;
 using Booki.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace Booki.Repositories
 {
@@ -106,6 +107,26 @@ namespace Booki.Repositories
 
             return editedUser;
         }
+
+        public bool UpdateUserPassword(int userId, string password, string salt)
+        {
+            bool updated;
+
+            try
+            {
+                var user = _bookiContext.Users.Where(u => u.Id == userId).FirstOrDefault();
+                user.Password = password;
+                user.Salt = salt;
+
+                _bookiContext.Users.Update(user);
+                Save();
+                updated = true;
+            }
+            catch (Exception) { updated = false; }
+
+            return updated;
+        }
+
 
         public bool CheckIfUsernameIsAvailable(string username)
         {

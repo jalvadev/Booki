@@ -54,12 +54,12 @@ namespace Booki.Helpers
             response = IsUserPasswordValid(user.Password);
 
             if (response.Success)
-                response = ConfirmationPassIsCorrect(user);
+                response = ConfirmationPassIsCorrect(user.Password, user.ConfirmationPassword);
 
             return response;
         }
 
-        private static IResponse IsUserPasswordValid(string password)
+        public static IResponse IsUserPasswordValid(string password)
         {
             IResponse response;
 
@@ -72,11 +72,11 @@ namespace Booki.Helpers
             return response;
         }
 
-        private static IResponse ConfirmationPassIsCorrect(UserRegistrationDTO user)
+        public static IResponse ConfirmationPassIsCorrect(string pass1, string pass2)
         {
             IResponse response;
 
-            if (user.Password.Equals(user.ConfirmationPassword))
+            if (pass1.Equals(pass2))
                 response = new SimpleResponse { Success = true, Message = "Las contraseñas coinciden." };
             else
                 response = new SimpleResponse { Success = false, Message = "Las contraseñas no coinciden." };

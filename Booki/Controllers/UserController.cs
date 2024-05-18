@@ -35,7 +35,7 @@ namespace Booki.Controllers
         }
 
         [HttpPatch("[Action]")]
-        public IActionResult EditUser(UserDetailDTO userDetailDTO)
+        public IActionResult EditUser([FromBody] UserDetailDTO userDetailDTO)
         {
             IResponse response;
             IResponse fileResponse;
@@ -61,6 +61,36 @@ namespace Booki.Controllers
             fileResponse = _fileService.ChangeUsernameDirectoryName(currentUser.Username, userDetailDTO.Username);
             if (!response.Success)
                 return BadRequest(fileResponse);
+
+            return Ok(response);
+        }
+
+        [HttpPatch("[Action]")]
+        public IActionResult EditPassword([FromBody] UserPasswordDTO userPassword)
+        {
+            IResponse response;
+
+            response = JWTHelper.GetUserFromHttpContext(HttpContext);
+            if (!response.Success)
+                return BadRequest(response);
+
+            User user = (response as ComplexResponse<User>).Result;
+
+            response = _userService.CheckUserPassword(user.Username, userPassword.OldPassword);
+            if(!response.Success)
+                return BadRequest(response);
+
+            response = RegistrationHelper.IsUserPasswordValid(userPassword.NewPassword);
+            if(!response.Success)
+                return BadRequest(response);
+
+            response = RegistrationHelper.ConfirmationPassIsCorrect(userPassword.NewPassword, userPassword.NewPassowrdConfirm);
+            if (!response.Success)
+                return BadRequest(response);
+
+            response = _userService.UpdateUserPassword(user.Id, userPassword.NewPassword);
+            if(!response.Success)
+                return BadRequest(response);
 
             return Ok(response);
         }
