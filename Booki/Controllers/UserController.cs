@@ -1,5 +1,7 @@
 ﻿using Booki.Helpers;
+using Booki.Models;
 using Booki.Models.DTOs;
+using Booki.Services;
 using Booki.Services.Interfaces;
 using Booki.Wrappers;
 using Booki.Wrappers.Interfaces;
@@ -14,9 +16,12 @@ namespace Booki.Controllers
     public class UserController : Controller
     {
         protected IUserService _userService;
-        public UserController(IUserService userSerrvice)
+        protected IImageService _imageService;
+
+        public UserController(IUserService userSerrvice, IImageService imageService)
         {
             _userService = userSerrvice;
+            _imageService = imageService;
         }
 
         [HttpGet("{userId}")]
@@ -32,17 +37,29 @@ namespace Booki.Controllers
         [HttpPatch("[Action]")]
         public IActionResult EditUser(UserDetailDTO userDetailDTO)
         {
-            var userIdResponse = JWTHelper.GetUserIdFromHttpContext(HttpContext);
-            if (!userIdResponse.Success)
-                return BadRequest(userIdResponse);
+            IResponse response;
 
-            int userId = (userIdResponse as ComplexResponse<int>).Result;
+            response = JWTHelper.GetUserFromHttpContext(HttpContext);
+            if (!response.Success)
+                return BadRequest(response);
 
-            var editResponse = _userService.EditUser(userDetailDTO, userId);
-            if(!editResponse.Success)
-                return BadRequest(editResponse);
+            User currentUser = (response as ComplexResponse<User>).Result;
 
-            return Ok(editResponse);
+            response = _imageService.SaveImage(currentUser.Username, userDetailDTO.ProfilePicture);
+            if (!response.Success)
+                return BadRequest(response);
+
+            response = _userService.EditUser(userDetailDTO, currentUser.Id);
+            if (!response.Success)
+                return BadRequest(response);
+
+            // TODO: Editar el nombre de la carpeta de usuario si fuese necesario.
+            if (!currentUser.Username.Equals(userDetailDTO.Username))
+            {
+
+            }
+
+            return Ok(response);
         }
     }
 }

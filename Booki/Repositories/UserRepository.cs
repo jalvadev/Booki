@@ -20,7 +20,7 @@ namespace Booki.Repositories
             User user = null;
             try
             {
-                user = _bookiContext.Users.Where(u => u.Username == username && u.Password == password && u.IsVerified).FirstOrDefault();
+                user = _bookiContext.Users.Where(u => u.Username.ToUpper() == username.ToUpper() && u.Password == password && u.IsVerified).FirstOrDefault();
             }catch (Exception ex)
             {
                 user = null;
@@ -70,6 +70,16 @@ namespace Booki.Repositories
             try
             {
                 user = _bookiContext.Users.Where(u => u.Id == id).FirstOrDefault();
+
+                var result = _bookiContext.Bookshelves
+                    .Join(_bookiContext.Users,
+                        b => b.Id,
+                        u => u.Bookshelf.Id,
+                        (b, u) => b 
+                    );
+
+                var bookShelve = result.FirstOrDefault();
+                user.Bookshelf = bookShelve;
             }
             catch (Exception ex)
             {
@@ -87,6 +97,7 @@ namespace Booki.Repositories
             {
                 var result = _bookiContext.Users.Update(user);
                 editedUser = result.Entity;
+                Save();
 
             }catch(Exception ex)
             {
@@ -102,7 +113,7 @@ namespace Booki.Repositories
 
             try
             {
-                isTaken = _bookiContext.Users.Where(u => u.Username == username).Any();
+                isTaken = _bookiContext.Users.Where(u => u.Username.ToUpper() == username.ToUpper()).Any();
             }catch(Exception ex)
             {
                 isTaken = true;

@@ -63,7 +63,9 @@ namespace Booki.Services
                 response = new SimpleResponse { Success = false, Message = "Ha ocurrido un error al obtener el usuario." };
             else
             {
-                currentUserData = _mapper.Map<User>(user);
+                currentUserData.Username = user.Username;
+                currentUserData.Email = user.Email;
+
                 currentUserData = _userRepository.EditUser(currentUserData);
                 response = currentUserData != null ?
                     new ComplexResponse<UserDetailDTO> { Success = true, Message = "Usuario editado.", Result = _mapper.Map<UserDetailDTO>(currentUserData) } :

@@ -33,10 +33,6 @@ namespace Booki.Profiles
                     opt => opt.MapFrom(src => src.Password)
                 );
 
-            CreateMap<UserDetailDTO, User>(MemberList.Source)
-                .ReverseMap();
-
-
             CreateMap<UserLogedDTO, User>()
                 .ForMember(
                     dest => dest.Username,
@@ -69,7 +65,7 @@ namespace Booki.Profiles
                     opt => opt.MapFrom(src => src.Email)
                 )
                 .ForMember(
-                    dest => dest.ProfilePicture,
+                    dest => dest.ProfilePictureName,
                     opt => opt.MapFrom(src => src.ProfilePicture)
                 );
             CreateMap<User, UserDetailDTO>()
@@ -82,7 +78,7 @@ namespace Booki.Profiles
                     opt => opt.MapFrom(src => src.Email)
                 )
                 .ForMember(
-                    dest => dest.ProfilePicture,
+                    dest => dest.ProfilePictureName,
                     opt => opt.MapFrom(src => src.ProfilePicture)
                 );
         }
