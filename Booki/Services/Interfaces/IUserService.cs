@@ -8,5 +8,7 @@ namespace Booki.Services.Interfaces
         IResponse RegisterUser(UserRegistrationDTO user);
 
         IResponse UserById(int id);
+
+        IResponse EditUser(UserDetailDTO user, int userId);
     }
 }

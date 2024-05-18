@@ -1,4 +1,7 @@
-﻿using Booki.Services.Interfaces;
+﻿using Booki.Helpers;
+using Booki.Models.DTOs;
+using Booki.Services.Interfaces;
+using Booki.Wrappers;
 using Booki.Wrappers.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -24,6 +27,22 @@ namespace Booki.Controllers
             return response.Success ?
                 Ok(response) :
                 BadRequest(response);
+        }
+
+        [HttpPatch("[Action]")]
+        public IActionResult EditUser(UserDetailDTO userDetailDTO)
+        {
+            var userIdResponse = JWTHelper.GetUserIdFromHttpContext(HttpContext);
+            if (!userIdResponse.Success)
+                return BadRequest(userIdResponse);
+
+            int userId = (userIdResponse as ComplexResponse<int>).Result;
+
+            var editResponse = _userService.EditUser(userDetailDTO, userId);
+            if(!editResponse.Success)
+                return BadRequest(editResponse);
+
+            return Ok(editResponse);
         }
     }
 }

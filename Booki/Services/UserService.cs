@@ -54,6 +54,25 @@ namespace Booki.Services
             return response;
         }
 
+        public IResponse EditUser(UserDetailDTO user, int userId)
+        {
+            IResponse response;
+
+            User currentUserData = _userRepository.UserById(userId);
+            if(currentUserData == null)
+                response = new SimpleResponse { Success = false, Message = "Ha ocurrido un error al obtener el usuario." };
+            else
+            {
+                currentUserData = _mapper.Map<User>(user);
+                currentUserData = _userRepository.EditUser(currentUserData);
+                response = currentUserData != null ?
+                    new ComplexResponse<UserDetailDTO> { Success = true, Message = "Usuario editado.", Result = _mapper.Map<UserDetailDTO>(currentUserData) } :
+                    new SimpleResponse { Success = false, Message = "Hubo un error al editar el usuario." };
+            }
+
+            return response;
+        }
+
         private User MapRegisterUser(UserRegistrationDTO user)
         {
             User userToRegister = _mapper.Map<User>(user);

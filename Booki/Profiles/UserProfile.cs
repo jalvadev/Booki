@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Booki.Models;
 using Booki.Models.DTOs;
+using System.Runtime.ConstrainedExecution;
 
 namespace Booki.Profiles
 {
@@ -31,6 +32,10 @@ namespace Booki.Profiles
                     dest => dest.Password,
                     opt => opt.MapFrom(src => src.Password)
                 );
+
+            CreateMap<UserDetailDTO, User>(MemberList.Source)
+                .ReverseMap();
+
 
             CreateMap<UserLogedDTO, User>()
                 .ForMember(

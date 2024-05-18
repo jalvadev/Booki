@@ -79,6 +79,23 @@ namespace Booki.Repositories
             return user;
         }
 
+        public User EditUser(User user)
+        {
+            User editedUser;
+
+            try
+            {
+                var result = _bookiContext.Users.Update(user);
+                editedUser = result.Entity;
+
+            }catch(Exception ex)
+            {
+                editedUser = null;
+            }
+
+            return editedUser;
+        }
+
         public bool CheckIfUsernameIsAvailable(string username)
         {
             bool isTaken = false;
