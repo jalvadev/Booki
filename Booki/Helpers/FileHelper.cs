@@ -1,4 +1,7 @@
-﻿namespace Booki.Helpers
+﻿using ImageMagick;
+using Microsoft.OpenApi.Extensions;
+
+namespace Booki.Helpers
 {
     public static class FileHelper
     {
@@ -61,6 +64,26 @@
             File.WriteAllBytes(fileName, image);
 
             return true;
+        }
+
+        public static string GetImageFormat(byte[] imageData)
+        {
+            string formatName;
+
+            var image = new MagickImage(imageData);
+            var format = image.Format;
+            formatName = format.GetDisplayName();
+
+            return formatName;
+
+        }
+
+        public static byte[] ConvertImageToJPG(byte[] imageData)
+        {
+            var image = new MagickImage(imageData);
+            image.Format = MagickFormat.Jpg;
+
+            return image.ToByteArray();
         }
     }
 }

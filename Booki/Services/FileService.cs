@@ -42,6 +42,7 @@ namespace Booki.Services
                 string booksDirectoryPath = FileHelper.CreateBooksDirectoryIfNotExists(userName);
 
                 byte[] coverBytes = FileHelper.ConvertBase64OnBytes(newBook.CoverPicture);
+                coverBytes = FileHelper.ConvertImageToJPG(coverBytes);
 
                 string currentBookPath = $"{booksDirectoryPath}/{Guid.NewGuid()}.jpg";
                 newBook.CoverPicture = currentBookPath;
