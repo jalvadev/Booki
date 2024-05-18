@@ -18,8 +18,8 @@ namespace Booki.Controllers
     public class BooksController : ControllerBase
     {
         private readonly IBookService _bookService;
-        private readonly IImageService _imageService;
-        public BooksController(IBookService bookService, IImageService imageService)
+        private readonly IFileService _imageService;
+        public BooksController(IBookService bookService, IFileService imageService)
         {
             _bookService = bookService;
             _imageService = imageService;

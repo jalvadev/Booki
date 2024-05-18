@@ -3,10 +3,12 @@ using Booki.Wrappers.Interfaces;
 
 namespace Booki.Services.Interfaces
 {
-    public interface IImageService
+    public interface IFileService
     {
         IResponse SaveImage(string userName, string picture);
 
         IResponse SaveCoverImage(BookDTO newBook, string userName);
+
+        IResponse ChangeUsernameDirectoryName(string oldName, string newName);
     }
 }

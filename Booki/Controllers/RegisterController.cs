@@ -21,9 +21,9 @@ namespace Booki.Controllers
         protected IConfiguration _configuration;
         protected IUserService _userService;
         protected IUserRepository _userRepository;
-        protected IImageService _imageService;
+        protected IFileService _imageService;
 
-        public RegisterController(IConfiguration configuration, IUserService userService, IUserRepository userRepository, IImageService imageService)
+        public RegisterController(IConfiguration configuration, IUserService userService, IUserRepository userRepository, IFileService imageService)
         {
             _configuration = configuration;
             _userService = userService;

@@ -1,6 +1,6 @@
 ﻿namespace Booki.Helpers
 {
-    public static class ImageHelper
+    public static class FileHelper
     {
         public static byte[] ConvertBase64OnBytes(string base64Image)
         {
@@ -30,6 +30,26 @@
 
 
             return fullPathDirectory;
+        }
+
+        public static bool ChangeUserDirectoryName(string oldName, string newName)
+        {
+            bool result = false;
+            
+            try
+            {
+                string fullPathOldDirectory = $"/images/{oldName}";
+                string fullPathNewDirectory = $"/images/{newName}";
+
+                if (Directory.Exists(fullPathOldDirectory))
+                {
+                    Directory.Move(fullPathOldDirectory, fullPathNewDirectory);
+                    result = true;
+                }
+            }
+            catch (Exception) { result = false; }
+
+            return result;
         }
 
         public static bool SaveImage(string fileName, byte[] image)

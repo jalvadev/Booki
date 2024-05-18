@@ -24,7 +24,7 @@ namespace Tests
         private Mock<IConfiguration> _configuration;
         private Mock<IUserService> _userService;
         private Mock<IUserRepository> _userRepository;
-        private Mock<IImageService> _imageService;
+        private Mock<IFileService> _imageService;
 
         [SetUp]
         public void Setup()
@@ -32,7 +32,7 @@ namespace Tests
             _configuration = new Mock<IConfiguration>();
             _userRepository = new Mock<IUserRepository>();
             _userService = new Mock<IUserService>();
-            _imageService = new Mock<IImageService>();
+            _imageService = new Mock<IFileService>();
 
             UserProfile userProfile = new UserProfile();
             var configuration = new MapperConfiguration(c => c.AddProfile(userProfile));

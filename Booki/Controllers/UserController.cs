@@ -16,12 +16,12 @@ namespace Booki.Controllers
     public class UserController : Controller
     {
         protected IUserService _userService;
-        protected IImageService _imageService;
+        protected IFileService _fileService;
 
-        public UserController(IUserService userSerrvice, IImageService imageService)
+        public UserController(IUserService userSerrvice, IFileService imageService)
         {
             _userService = userSerrvice;
-            _imageService = imageService;
+            _fileService = imageService;
         }
 
         [HttpGet("{userId}")]
@@ -38,6 +38,7 @@ namespace Booki.Controllers
         public IActionResult EditUser(UserDetailDTO userDetailDTO)
         {
             IResponse response;
+            IResponse fileResponse;
 
             response = JWTHelper.GetUserFromHttpContext(HttpContext);
             if (!response.Success)
@@ -49,19 +50,17 @@ namespace Booki.Controllers
             if (!response.Success)
                 return BadRequest(response);
 
-            response = _imageService.SaveImage(currentUser.Username, userDetailDTO.ProfilePicture);
-            if (!response.Success)
-                return BadRequest(response);
-
             response = _userService.EditUser(userDetailDTO, currentUser.Id);
             if (!response.Success)
                 return BadRequest(response);
 
-            // TODO: Editar el nombre de la carpeta de usuario si fuese necesario.
-            if (!currentUser.Username.Equals(userDetailDTO.Username))
-            {
+            fileResponse = _fileService.SaveImage(currentUser.Username, userDetailDTO.ProfilePicture);
+            if (!response.Success)
+                return BadRequest(fileResponse);
 
-            }
+            fileResponse = _fileService.ChangeUsernameDirectoryName(currentUser.Username, userDetailDTO.Username);
+            if (!response.Success)
+                return BadRequest(fileResponse);
 
             return Ok(response);
         }
