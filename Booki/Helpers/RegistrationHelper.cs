@@ -88,9 +88,9 @@ namespace Booki.Helpers
         {
             IResponse response;
 
-            bool isTaken = _userRepository.CheckIfUsernameIsAvailable(user.UserName);
+            bool isAvailable = _userRepository.CheckIfUsernameIsAvailable(user.UserName);
 
-            return isTaken ? new SimpleResponse { Success = false, Message = "El nombre de usuario ya está en uso." }
+            return !isAvailable ? new SimpleResponse { Success = false, Message = "El nombre de usuario ya está en uso." }
                 : new SimpleResponse { Success = true, Message = "El nombre de usuario está libre." };
         }
 
@@ -98,9 +98,9 @@ namespace Booki.Helpers
         {
             IResponse response;
 
-            bool isTaken = _userRepository.CheckIfEmailIsAvailable(user.Email);
+            bool isAvailable = _userRepository.CheckIfEmailIsAvailable(user.Email);
 
-            return isTaken ? new SimpleResponse { Success = false, Message = "El email ya está en uso." }
+            return !isAvailable ? new SimpleResponse { Success = false, Message = "El email ya está en uso." }
             : new SimpleResponse { Success = true, Message = "El email está libre." };
         }
     }

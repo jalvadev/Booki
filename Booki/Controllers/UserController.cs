@@ -45,6 +45,10 @@ namespace Booki.Controllers
 
             User currentUser = (response as ComplexResponse<User>).Result;
 
+            response = _userService.CheckIfNewUsernameIsAvailable(currentUser.Username, userDetailDTO.Username);
+            if (!response.Success)
+                return BadRequest(response);
+
             response = _imageService.SaveImage(currentUser.Username, userDetailDTO.ProfilePicture);
             if (!response.Success)
                 return BadRequest(response);

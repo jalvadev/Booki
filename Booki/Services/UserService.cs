@@ -60,11 +60,12 @@ namespace Booki.Services
 
             User currentUserData = _userRepository.UserById(userId);
             if(currentUserData == null)
-                response = new SimpleResponse { Success = false, Message = "Ha ocurrido un error al obtener el usuario." };
+                return new SimpleResponse { Success = false, Message = "Ha ocurrido un error al obtener el usuario." };
             else
             {
                 currentUserData.Username = user.Username;
                 currentUserData.Email = user.Email;
+                currentUserData.LastUpdate = DateTime.Now;
 
                 currentUserData = _userRepository.EditUser(currentUserData);
                 response = currentUserData != null ?
@@ -73,6 +74,21 @@ namespace Booki.Services
             }
 
             return response;
+        }
+
+        public IResponse CheckIfNewUsernameIsAvailable(string username, string newUsername)
+        {
+            IResponse response;
+            bool isAvailable = true;
+
+            if (!username.Equals(newUsername))
+            {
+                isAvailable = _userRepository.CheckIfUsernameIsAvailable(newUsername);
+            }          
+
+            return isAvailable ?
+                new SimpleResponse { Success = true, Message = "El username está libre." } :
+                new SimpleResponse { Success = false, Message = "El username ya está en uso." };
         }
 
         private User MapRegisterUser(UserRegistrationDTO user)

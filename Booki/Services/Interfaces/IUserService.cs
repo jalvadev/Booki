@@ -10,5 +10,7 @@ namespace Booki.Services.Interfaces
         IResponse UserById(int id);
 
         IResponse EditUser(UserDetailDTO user, int userId);
+
+        IResponse CheckIfNewUsernameIsAvailable(string username, string newUsername);
     }
 }

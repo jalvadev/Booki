@@ -109,33 +109,33 @@ namespace Booki.Repositories
 
         public bool CheckIfUsernameIsAvailable(string username)
         {
-            bool isTaken = false;
+            bool isAvailable = false;
 
             try
             {
-                isTaken = _bookiContext.Users.Where(u => u.Username.ToUpper() == username.ToUpper()).Any();
+                isAvailable = !_bookiContext.Users.Where(u => u.Username.ToUpper() == username.ToUpper()).Any();
             }catch(Exception ex)
             {
-                isTaken = true;
+                isAvailable = true;
             }
 
-            return isTaken;
+            return isAvailable;
         }
 
         public bool CheckIfEmailIsAvailable(string email)
         {
-            bool isTaken = false;
+            bool isAvailable = false;
 
             try
             {
-                isTaken = _bookiContext.Users.Where(u => u.Email == email).Any();
+                isAvailable = !_bookiContext.Users.Where(u => u.Email == email).Any();
             }
             catch (Exception ex)
             {
-                isTaken = true;
+                isAvailable = true;
             }
 
-            return isTaken;
+            return isAvailable;
         }
 
         public bool SetUserVerification(Guid token)
