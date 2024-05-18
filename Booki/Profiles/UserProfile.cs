@@ -32,10 +32,10 @@ namespace Booki.Profiles
                     opt => opt.MapFrom(src => src.Password)
                 );
 
-            CreateMap<UserProfileDTO, User>()
+            CreateMap<UserLogedDTO, User>()
                 .ForMember(
                     dest => dest.Username,
-                    opt => opt.MapFrom(src => src.UserName)
+                    opt => opt.MapFrom(src => src.Username)
                  )
                 .ForMember(
                     dest => dest.Email,
@@ -54,9 +54,22 @@ namespace Booki.Profiles
                     dest => dest.Password,
                     opt => opt.MapFrom(src => src.Password)
                 );
-            CreateMap<User, UserProfileDTO>()
+            CreateMap<User, UserLogedDTO>()
                 .ForMember(
-                    dest => dest.UserName,
+                    dest => dest.Username,
+                    opt => opt.MapFrom(src => src.Username)
+                )
+                .ForMember(
+                    dest => dest.Email,
+                    opt => opt.MapFrom(src => src.Email)
+                )
+                .ForMember(
+                    dest => dest.ProfilePicture,
+                    opt => opt.MapFrom(src => src.ProfilePicture)
+                );
+            CreateMap<User, UserDetailDTO>()
+                .ForMember(
+                    dest => dest.Username,
                     opt => opt.MapFrom(src => src.Username)
                 )
                 .ForMember(

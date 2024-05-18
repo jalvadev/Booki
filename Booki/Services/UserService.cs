@@ -31,8 +31,8 @@ namespace Booki.Services
                 response = new SimpleResponse { Success = false, Message = "Ha ocurrido un error al registrar el usuario." };
             else
             {
-                UserProfileDTO registeredUser = _mapper.Map<UserProfileDTO>(userToRegister);
-                response = new ComplexResponse<UserProfileDTO> { Success = true, Message = "Usuario registrado.", Result = registeredUser };
+                UserLogedDTO registeredUser = _mapper.Map<UserLogedDTO>(userToRegister);
+                response = new ComplexResponse<UserLogedDTO> { Success = true, Message = "Usuario registrado.", Result = registeredUser };
             }
 
             return response;
@@ -47,8 +47,8 @@ namespace Booki.Services
                 response = new SimpleResponse { Success = false, Message = "Ha ocurrido un error al obtener el usuario." };
             else
             {
-                UserProfileDTO registeredUser = _mapper.Map<UserProfileDTO>(user);
-                response = new ComplexResponse<UserProfileDTO> { Success = true, Message = "Usuario obtenido.", Result = registeredUser };
+                UserDetailDTO registeredUser = _mapper.Map<UserDetailDTO>(user);
+                response = new ComplexResponse<UserDetailDTO> { Success = true, Message = "Usuario obtenido.", Result = registeredUser };
             }
 
             return response;

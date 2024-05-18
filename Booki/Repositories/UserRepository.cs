@@ -69,8 +69,7 @@ namespace Booki.Repositories
 
             try
             {
-                var result = _bookiContext.Users.Where(u => u.Id == id);
-                Save();
+                user = _bookiContext.Users.Where(u => u.Id == id).FirstOrDefault();
             }
             catch (Exception ex)
             {

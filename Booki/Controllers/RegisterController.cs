@@ -46,7 +46,7 @@ namespace Booki.Controllers
 
             if (response.Success)
             {
-                var result = response as ComplexResponse<UserProfileDTO>;
+                var result = response as ComplexResponse<UserLogedDTO>;
                 SendVerificationEmail(user.Email, result.Result.VerificationToken);
             }
 

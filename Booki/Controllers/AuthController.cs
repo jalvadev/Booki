@@ -120,10 +120,10 @@ namespace Booki.Controllers
 
         private IResponse GetUserDTOWithToken(User user)
         {
-            UserProfileDTO userProfileDTO = _mapper.Map<UserProfileDTO>(user);
+            UserLogedDTO userProfileDTO = _mapper.Map<UserLogedDTO>(user);
             userProfileDTO.Token = GetUserToken(user);
 
-            return new ComplexResponse<UserProfileDTO> { Success = true, Message = "Usuario logeado.", Result = userProfileDTO }; ;
+            return new ComplexResponse<UserLogedDTO> { Success = true, Message = "Usuario logeado.", Result = userProfileDTO }; ;
         }
 
         private string GetUserToken(User user)

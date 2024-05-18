@@ -1,8 +1,8 @@
 ﻿namespace Booki.Models.DTOs
 {
-    public class UserProfileDTO
+    public class UserLogedDTO
     {
-        public string UserName { get; set; }
+        public string Username { get; set; }
 
         public string Email { get; set; }
 
