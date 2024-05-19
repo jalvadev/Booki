@@ -13,5 +13,8 @@ namespace Booki.Repositories.Interfaces
         bool CheckIfUsernameIsAvailable(string username);
         bool CheckIfEmailIsAvailable(string email);
         bool SetUserVerification(Guid token);
+        User GetUserByVerificationToken(Guid token);
+        bool SetUserVerificationToken(string email, Guid token);
+        bool DeleteUserVerificationToken(int userId);
     }
 }

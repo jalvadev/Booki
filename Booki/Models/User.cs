@@ -22,6 +22,6 @@
 
         public Bookshelf Bookshelf { get; set; }
 
-        public Guid VerificationToken { get; set; }
+        public Guid? VerificationToken { get; set; }
     }
 }

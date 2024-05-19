@@ -16,5 +16,7 @@ namespace Booki.Services.Interfaces
         IResponse UpdateUserPassword(int userId, string password);
 
         IResponse CheckUserPassword(string username, string password);
+
+        IResponse RestoreUserPassword(Guid restoreToken, string newPassord);
     }
 }

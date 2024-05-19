@@ -124,6 +124,23 @@ namespace Booki.Services
             return response;
         }
 
+        public IResponse RestoreUserPassword(Guid restoreToken, string newPassord)
+        {
+            IResponse response;
+            bool success;
+
+            User user = _userRepository.GetUserByVerificationToken(restoreToken);
+            if (user == null)
+                response = new SimpleResponse { Success = false, Message = "No se ha podido obtener el usuario." };
+            else
+            {
+                response = UpdateUserPassword(user.Id, newPassord);
+            }
+
+            return response;
+        }
+
+
         private User MapRegisterUser(UserRegistrationDTO user)
         {
             User userToRegister = _mapper.Map<User>(user);

@@ -103,5 +103,20 @@ namespace Booki.Helpers
             return !isAvailable ? new SimpleResponse { Success = false, Message = "El email ya está en uso." }
             : new SimpleResponse { Success = true, Message = "El email está libre." };
         }
+
+        public static IResponse CheckRecoveryToken(Guid? token)
+        {
+            IResponse response;
+            bool isOk;
+
+            isOk = token.HasValue;
+            if (!isOk)
+                return new SimpleResponse { Success = false, Message = "Es necesario el token de recuperación." };
+
+            isOk = token.Value is Guid;
+
+            return !isOk ? new SimpleResponse { Success = false, Message = "El token no es válido." }
+                : new SimpleResponse { Success = true, Message = "El token es válido." };
+        }
     }
 }

@@ -84,7 +84,7 @@ namespace Booki.Controllers
             if(!response.Success)
                 return BadRequest(response);
 
-            response = RegistrationHelper.ConfirmationPassIsCorrect(userPassword.NewPassword, userPassword.NewPassowrdConfirm);
+            response = RegistrationHelper.ConfirmationPassIsCorrect(userPassword.NewPassword, userPassword.NewPasswordConfirm);
             if (!response.Success)
                 return BadRequest(response);
 

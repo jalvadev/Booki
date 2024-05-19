@@ -180,6 +180,63 @@ namespace Booki.Repositories
             return verified;
         }
 
+        public User GetUserByVerificationToken(Guid token)
+        {
+            User user;
+
+            try
+            {
+                user = _bookiContext.Users.Where(u => u.VerificationToken == token).FirstOrDefault();
+
+            }catch(Exception) { user = null; }
+
+            return user;
+        }
+
+        public bool SetUserVerificationToken(string email, Guid token)
+        {
+            bool verified = false;
+
+            try
+            {
+                User user = _bookiContext.Users.Where(u => u.Email == email).FirstOrDefault();
+                user.VerificationToken = token;
+
+                _bookiContext.Update(user);
+                Save();
+
+                verified = true;
+            }
+            catch (Exception e)
+            {
+                verified = false;
+            }
+
+            return verified;
+        }
+
+        public bool DeleteUserVerificationToken(int userId)
+        {
+            bool verified = false;
+
+            try
+            {
+                User user = _bookiContext.Users.Where(u => u.Id == userId).FirstOrDefault();
+                user.VerificationToken = null;
+
+                _bookiContext.Update(user);
+                Save();
+
+                verified = true;
+            }
+            catch (Exception e)
+            {
+                verified = false;
+            }
+
+            return verified;
+        }
+
         public void Save()
         {
             _bookiContext.SaveChanges();

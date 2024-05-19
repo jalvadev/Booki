@@ -15,6 +15,7 @@ using System.Net.Mail;
 using System.Text.RegularExpressions;
 using System.Security.Cryptography;
 using Salty.Hashers;
+using Booki.Services.Interfaces;
 
 namespace Booki.Controllers
 {
@@ -24,11 +25,13 @@ namespace Booki.Controllers
     {
         private readonly IConfiguration _configuration;
         private readonly IUserRepository _userRepository;
+        private readonly IUserService _userService;
         private readonly IMapper _mapper;
-        public AuthController(IConfiguration configuration, IUserRepository userRepository, IMapper mapper) 
+        public AuthController(IConfiguration configuration, IUserRepository userRepository, IUserService userService, IMapper mapper) 
         {
             _configuration = configuration;
             _userRepository = userRepository;
+            _userService = userService;
             _mapper = mapper;
         }
 
@@ -46,6 +49,73 @@ namespace Booki.Controllers
                 return BadRequest(response);
 
             return Ok(response);
+        }
+
+        [HttpPost("[action]")]
+        public IActionResult SendRestoreEmail([FromBody] string email)
+        {
+            bool emailExists = !_userRepository.CheckIfEmailIsAvailable(email);
+            if (!emailExists)
+                return BadRequest(new SimpleResponse { Success = false, Message = "El email no existe." });
+
+            Guid token = Guid.NewGuid();
+            bool tokenSet = _userRepository.SetUserVerificationToken(email, token);
+            if (!tokenSet)
+                return BadRequest(new SimpleResponse { Success = false, Message = "No se pudo generar el token de recuperación." });
+
+            SendRecoveryEmail(email, token);
+
+            return Ok(new SimpleResponse { Success = true, Message = "Se ha enviado un email para recuperar tu cuenta." });
+        }
+
+        [HttpPost("[action]")]
+        public IActionResult RestorePassword([FromBody] UserPasswordDTO userPassword)
+        {
+            IResponse response;
+
+            response = RegistrationHelper.IsUserPasswordValid(userPassword.NewPassword);
+            if (!response.Success)
+                return BadRequest(response);
+
+            response = RegistrationHelper.CheckRecoveryToken(userPassword.RestoreToken);
+            if (!response.Success)
+                return BadRequest(response);
+
+            response = RegistrationHelper.ConfirmationPassIsCorrect(userPassword.NewPassword, userPassword.NewPasswordConfirm);
+            if (!response.Success)
+                return BadRequest(response);
+
+            response = _userService.RestoreUserPassword(userPassword.RestoreToken.Value, userPassword.NewPassword);
+            if (!response.Success)
+                return BadRequest(response);
+
+            return Ok(response);
+        }
+
+        // TODO : Clean this code ->
+        private void SendRecoveryEmail(string userEmail, Guid token)
+        {
+            string host = _configuration.GetValue<string>("Email:host");
+            int port = _configuration.GetValue<int>("Email:port");
+
+            string username = _configuration.GetValue<string>("Email:user");
+            string password = _configuration.GetValue<string>("Email:password");
+            string from = _configuration.GetValue<string>("Email:from");
+            string subject = _configuration.GetValue<string>("Email:subject");
+            string body = _configuration.GetValue<string>("Email:bodyRecovery");
+
+            body = body.Replace("##TOKEN##", token.ToString());
+
+            SmtpClient client = new SmtpClient(host, port);
+
+            MailMessage message = new MailMessage(from, userEmail, subject, body);
+            message.IsBodyHtml = true;
+
+            client.EnableSsl = true;
+            client.UseDefaultCredentials = false;
+            client.Credentials = new NetworkCredential(username, password);
+
+            client.Send(message);
         }
 
         #region Private Methods
