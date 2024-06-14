@@ -8,7 +8,7 @@
 
         public string Title { get; set; }
 
-        public DateTime FinishDate { get; set; }
+        public DateTime? FinishDate { get; set; }
 
         public short Rating { get; set; }
 

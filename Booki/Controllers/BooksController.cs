@@ -135,6 +135,10 @@ namespace Booki.Controllers
                 response = new SimpleResponse { Success = false, Message = "El libro debe tener una portada." };
             else if (string.IsNullOrEmpty(newBook.Title))
                 response = new SimpleResponse { Success = false, Message = "El libro debe tener un título." };
+            else if (newBook.Rating <= 0 || newBook.Rating > 5)
+                response = new SimpleResponse { Success = false, Message = "La puntuación es obligatoria, el mínimo es una estrella." };
+            else if (!newBook.FinishDate.HasValue)
+                response = new SimpleResponse { Success = false, Message = "La fecha es obligatoria." };
             else
                 response = new SimpleResponse { Success = true, Message = "Todos los campos ok." };
 
