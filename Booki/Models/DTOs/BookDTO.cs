@@ -6,7 +6,7 @@
 
         public string CoverPicture { get; set; }
 
-        public string CoverPictureName { get; set; }
+        public string? CoverPictureName { get; set; }
 
         public string Title { get; set; }
 
