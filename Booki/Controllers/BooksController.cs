@@ -88,18 +88,17 @@ namespace Booki.Controllers
             if (!response.Success)
                 return BadRequest(response);
 
-            response = JWTHelper.GetUserIdFromHttpContext(HttpContext);
+            response = JWTHelper.GetUserFromHttpContext(HttpContext);
             if (!response.Success)
                 return BadRequest(response);
 
-            var responseJWT = response as ComplexResponse<int>;
-            int userId = responseJWT.Result;
+            User user = (response as ComplexResponse<User>).Result;
 
-            response = _bookService.CheckIfBookBelongToUser(book.Id, userId);
+            response = _bookService.CheckIfBookBelongToUser(book.Id, user.Id);
             if (!response.Success)
                 return BadRequest(response);
 
-            response = _bookService.UpdateBook(book);
+            response = UpdateBook(book, user);
             if (!response.Success)
                 return BadRequest(response);
 
@@ -154,6 +153,19 @@ namespace Booki.Controllers
 
             if(response.Success)
                 _bookService.InsertBook(newBook, user.Id);
+
+            return response;
+        }
+
+        private IResponse UpdateBook(BookDTO book, User user)
+        {
+            IResponse response;
+
+
+            response = _imageService.UpdateCoverImage(book, user.Username);
+
+            if (response.Success)
+                _bookService.UpdateBook(book);
 
             return response;
         }

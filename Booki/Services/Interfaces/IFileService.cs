@@ -9,6 +9,8 @@ namespace Booki.Services.Interfaces
 
         IResponse SaveCoverImage(BookDTO newBook, string userName);
 
+        IResponse UpdateCoverImage(BookDTO book, string userName);
+
         IResponse ChangeUsernameDirectoryName(string oldName, string newName);
     }
 }

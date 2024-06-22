@@ -60,6 +60,33 @@ namespace Booki.Services
             return response;
         }
 
+        public IResponse UpdateCoverImage(BookDTO book, string userName)
+        {
+            IResponse response;
+
+            try
+            {
+                string userDirectoryPath = FileHelper.CreateUserDirectoryIfNotExists(userName);
+                string booksDirectoryPath = FileHelper.CreateBooksDirectoryIfNotExists(userName);
+
+                byte[] coverBytes = FileHelper.ConvertBase64OnBytes(book.CoverPicture);
+                coverBytes = FileHelper.ConvertImageToJPG(coverBytes);
+
+                string currentBookPath = $"{booksDirectoryPath}/{book.CoverPictureName}";
+                book.CoverPicture = currentBookPath;
+
+                bool saved = FileHelper.SaveImage(currentBookPath, coverBytes);
+
+                response = new SimpleResponse { Success = saved, Message = "Libro guardado." };
+            }
+            catch (Exception e)
+            {
+                response = new SimpleResponse { Success = false, Message = "Error al guardar la imagen" };
+            }
+
+            return response;
+        }
+
         public IResponse ChangeUsernameDirectoryName(string oldName, string newName)
         {
             IResponse response;
