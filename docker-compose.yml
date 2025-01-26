@@ -13,12 +13,13 @@ services:
     volumes:
       - "C:/images:/images" #volume name:path for app images.
   bookidatabase:
-    image: ${DOCKER_REGISTRY-}postgres
+    image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: booki_database
     ports:
-        - "5432:5432" #Host:Container
+        - "1433:1433" #Host:Container
     environment:
-        - POSTGRES_USER=admin
-        - POSTGRES_PASSWORD=pass123
+        - ACCEPT_EULA=Y
+        - MSSQL_SA_PASSWORD=pass123#Evan
+        - MSSQL_PID=Express
     volumes:
-      - "C:/Data/Booki:/var/lib/postgresql/data" #volume name:path for db data.
+      - "C:/Data/Booki:/var/opt/mssql/data" #volume name:path for db data.
